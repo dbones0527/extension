@@ -1,7 +1,5 @@
 "use strict";
 
-const platform = chrome;
-
 /*
  * For debug purposes only. This displays the "message" within the UI.
  */

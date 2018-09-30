@@ -30,16 +30,18 @@ TODO: write details
 
  - Network filter, sometimes referred to as ad blocker.
    The best way to ensure a connection does not disclose any information
-   is to block the connection entirely. Even a mere act of establishing a 
-   connection already leaks user IP address and Request blocking is
-   implemented by many other software solutions:
-    - uBlock Origin (not to be confused with uBlock) is widely praised for
-	  versatility, efficiency, good moral compass, and privacy policy
+   is to block the connection entirely. (E.g., even a mere act of 
+   establishing a connection already leaks user IP address.) Request 
+   blocking is implemented by many other software solutions:
+    - uBlock Origin (not to be confused with uBlock) is a browser extension
+      widely praised for versatility, efficiency, absence of monetary 
+	  conflicts of interest, and a good [privacy policy](https://github.com/gorhill/uBlock/wiki/Privacy-policy).
     - uMatrix is sometimes referred to as uBlock Origin for advanced users
     - Privacy Badger 
-    - Adblock - a commercial product with a fair share of controversy 
-	- Adblock Plus - another commercial product with a fair share of
-      controversy
+	- AdGuard has browser extensions and stand-alone network filters
+    - Adblock - a commercial product, with "Acceptable Ads" controversy 
+	- Adblock Plus - another commercial product, also tainted by "Acceptable Ads" controversy
+    - Firefox has "Tracking Protection" (limited to Disconnect filters)
     - Brave browser has a built-in filter engine
     - Opera browser has a built-in filter engine
     - Yandex.Browser has a built-in filter engine (and whitelist for 
@@ -50,6 +52,8 @@ TODO: write details
    information and modify it. User should always be cautious when visiting 
    HTTP pages, and prbably use extension that forces HTTPS for content available
    over HTTPS. "HTTPS Everywhere" is a a great tool for that.
+
+### 
 
 ## Privacy and Security
 

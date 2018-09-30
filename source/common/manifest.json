@@ -11,12 +11,12 @@
 	},
 	"permissions": [
 		"storage",
-		"cookies",
-		"http://*/*",
-		"https://*/*"
+		"cookies"
 	],
 	"optional_permissions": [
-		"webRequest"
+		"webRequest",
+		"http://*/",
+		"https://*/"
 	],
 	"devtools_page": "pages/devtools/devtools.html",
 	"options_ui": {

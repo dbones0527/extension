@@ -1,6 +1,95 @@
 # Cookie Policy
 
-This extension eforces more strict cookie security by adding flags, including `Secure;`, `SameSite=[Lax|Strict];`, and `HttpOnly;`.
+*NOTE*: It's early on in the development process, so a lot can and will change.
+
+An extension that helps user dynamically analyze a site and recommends 
+appropriate more strict cookie security flags, including `Secure;`, 
+`SameSite=[Lax|Strict];`, and `HttpOnly;` and cookie prefixes __Secure-*
+ and __Host-*.
+
+## Overview
+
+The modern web heavily relies on HTTP Cookies, some of which are
+used to track users, invading their privacy. Since cookies have "dual use" 
+(for privacy-invading trackers as well as useful features), the user can 
+not disable cookies without breaking the majority of the sites online.
+This extension aims to inform the user of the potential privacy risk 
+associated with specific cookies. It aims to perform only a small set of 
+functions and do them well. In general, *the user should also use other 
+software* to protect own privacy, because cookies are not the only 
+technology used for tracking. Please refer to "This extension is 
+*not*" for a summary of what *other* software you might want to use 
+*together* with this extension.
+
+### This extension is:
+
+ - A method to visualize HTTP cookies and their contents and behavior
+TODO: write details
+
+### Limitations of this extension, or what this extension is *not*:
+
+ - Network filter, sometimes referred to as ad blocker.
+   The best way to ensure a connection does not disclose any information
+   is to block the connection entirely. Even a mere act of establishing a 
+   connection already leaks user IP address and Request blocking is
+   implemented by many other software solutions:
+    - uBlock Origin (not to be confused with uBlock) is widely praised for
+	  versatility, efficiency, good moral compass, and privacy policy
+    - uMatrix is sometimes referred to as uBlock Origin for advanced users
+    - Privacy Badger 
+    - Adblock - a commercial product with a fair share of controversy 
+	- Adblock Plus - another commercial product with a fair share of
+      controversy
+    - Brave browser has a built-in filter engine
+    - Opera browser has a built-in filter engine
+    - Yandex.Browser has a built-in filter engine (and whitelist for 
+      tracking services provided by Yandex itself)
+ - HTTPS enforcer (mixed content resolver)
+   HTTP is a plaintext protocol, which means someone can temper with it 
+   in transit. Specifically, "man in the middle" can observe all transmited
+   information and modify it. User should always be cautious when visiting 
+   HTTP pages, and prbably use extension that forces HTTPS for content available
+   over HTTPS. "HTTPS Everywhere" is a a great tool for that.
+
+## Privacy and Security
+
+### Privacy Policy
+
+This extension exists to fulfill only one goal -- to protect user's 
+privacy -- therefore:
+ - All user information is stored locally in the user's browser and 
+   is never shared with anyone.
+ - All information is discarded as soon as it is no longer needed.
+ - The user can delete all collected information at all times.
+ - This extension runs with the least API permissions possible. 
+   See API Permissions Policy for details.
+
+### API Permissions Policy
+
+This extension runs with the least API permissions possible.
+ - Each permission is declared "optional" if it is practical.
+ - On the first install, the user should go into the extension options
+   and enable all the desired features (and give the permissions).
+ - Permissions are removed if they are no longer required (and 
+   requested again if the user activates feature requiring the permission).
+   The browser might not prompt the user every time if the user granted the
+   permission already.
+
+The actual permissions include:
+TODO: write stuff
+
+### Security
+
+Nothing can be private unless it is secure, therefore this extension 
+takes the following precautions:
+ - Uses the least API permissions possible
+ - Reasonable CSP
+ - 
+
+## Building
+
+`Makefile` provides recipes for building unpacked builds.
+TODO: Packing builds?
 
 ## Dependencies
 
@@ -8,35 +97,41 @@ Please refer to "Folder structure" `/common/includes/*`
 
 ## Folder structure
 
- - `/common/*` contains code shared among all WebExtension extensions
-   - `/common/background/*` contains all background scripts
-     - `/common/background/cookiestore.js` maintains the cookie database
-   - `/common/includes/*` contains all the ouside dependencies
-     - table-resize, `/includes/table-resize.js`, https://github.com/irhc/table-resize; Licensed under MIT (c) irhc and others.
-     - JavaScript Cookie, `/includes/js.cookie-*.min.js`, helps with Chromium `chrome.cookies` Cookie API
-   - `/common/pages/*` contains all the interfaces
- - `/chromium/*` contains Chromium-specific code
- - `/firefox/*` contains Firefox-specific code
+ - `source/*` WebExtension source code
+   - `source/common/*` contains code shared among all WebExtension extensions
+     - `source/common/background/*` contains all background scripts
+       - `source/common/background/cookiestore.js` maintains the cookie database
+     - `source/common/includes/*` contains all the ouside dependencies
+       - table-resize, `/includes/table-resize.js`, https://github.com/irhc/table-resize; Licensed under MIT (c) irhc and others.
+       - JavaScript Cookie, `/includes/js.cookie-*.min.js`, helps with Chromium `chrome.cookies` Cookie API
+     - `source/common/pages/*` contains all the interfaces
+   - `source/chromium/*` contains Chromium-specific code
+   - `source/firefox/*` contains Firefox-specific code
+ - `build/*` contains all the builds generated from the source code
 
 ## Minimum browser requirements
 
+The extension is built for [WebExtensions API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions),
+which is supported by modern Chromium, Firefox, and Microsoft Edge browsers. Specifically, it requires following APIs: `cookies`,
+`storage`, and optionally (recommended) `webRequest`.
+
 ### Chromium
 
-This extension require Chromium 26 and up because it relies on `chrome.cookies` API, 
+Chromium is the primary target for this extension development, because of 
+This extension requires Chromium 26 and up because it relies on `chrome.cookies` API, 
 however `SameSiteStatus` is accessible only in Chromium 51 and up. [source](https://developer.chrome.com/extensions/cookies)
 
 ### Firefox
 
-Doesn't work with Firefox yet, but will work with [WebExtensions API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions).
-
-### Safari
-
-Does not support Safari yet.
+Doesn't work with Firefox yet, but will eventually.
 
 ### Microsoft Edge
 
-Does not support Microsoft Edge yet.
+Does not support Microsoft Edge, but might eventually.
 
-# Background information
- https://www.wfanet.org/news-centre/wfa-manifesto-for-online-data-transparency/
- https://pagefair.com/blog/2018/facebook-brussels-case/
+### Apple Safari
+
+Probably will never support Apple Safari natively, because Safari does not support WebExtensions API. Even then, Safari support is not a priority currently. Might support Safari in a distant future via a polyfill library.
+
+
+https://www.sjoerdlangkemper.nl/2017/02/09/cookie-prefixes/

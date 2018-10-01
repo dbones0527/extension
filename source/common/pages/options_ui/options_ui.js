@@ -4,6 +4,7 @@
  * For debug purposes only. This displays the "message" within the UI.
  */
 function debugMessage(message){
+	console.log(message);
 	var div = document.createElement("DIV");
 	div.innerText = message;
 	document.body.appendChild(div);
@@ -113,7 +114,7 @@ function addOrigin(origin){
  * Docs say that "After a permission has been removed, calling permissions.request() usually adds the permission back without prompting the user." 
  */
 function choiceHandlerWebRequest(evt){
-	const checked = event.target.checked;
+	const checked = evt.target.checked;
 	chrome.storage.local.set({WebRequest: checked});
 	if (checked){
 		// WebRequest integration requested
@@ -152,7 +153,7 @@ function choiceHandlerWebRequest(evt){
  * DevTools permission can not be declared optional.
  */
 function choiceHandlerDevTools(evt){
-	const checked = event.target.checked;
+	const checked = evt.target.checked;
 //	localStorage.setItem("DevTools", checked);
 	chrome.storage.local.set({DevTools: checked});
 	debugMessage("DevTools clicked, set to " + checked);

@@ -5,6 +5,7 @@
     <title>Options</title>
     <script src="/platform.js" defer></script>
     <script src="options_ui.js" defer></script>
+    <script src="options_ui_platform.js" defer></script>
     <link rel="stylesheet" type="text/css" href="options_ui.css">
     <link rel="stylesheet" type="text/css" href="options_ui_platform.css">
   </head>
@@ -32,12 +33,11 @@
     <p>This setting works similarly to the Chromium content settings. This is just the list of "origins" specified in the permissions. Simply put, the extension will only run on the pages matching at least one expression:</p>
     <form id="newOriginForm">
     <label for="newOrigin">New origin</label>
-    <input type="text" id="newOrigin" placeholder="Origin URL">
+    <input type="url" id="newOrigin" placeholder="https://example.com/" required>
     <input type="submit" value="Add origin">
     </form>
     <p>TODO: for some reasson, domains have to end with slash.</p>
-    <ul id="origins">
-	</ul>
-    
+    <ul id="origins"></ul>
+
   </body>
 </html>

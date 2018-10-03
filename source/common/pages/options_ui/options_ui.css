@@ -1,3 +1,17 @@
 ul {
 	list-style: none
 }
+
+#origins > li {
+	border-bottom: 1px solid silver;
+	height: 2em;
+	margin-right: 5%;
+	margin-top: 0.5em;
+}
+
+#origins > li > button {
+	height: 100%;
+	float: right;
+	border-radius: 50%;
+    background: grey;
+}

@@ -4,19 +4,25 @@
  * For debug purposes only. This displays the "message" within the UI.
  */
 function debugMessage(message){
-	console.log(message);
+	//console.log(message);
 	var div = document.createElement("DIV");
 	div.innerText = message;
 	document.body.appendChild(div);
 }
 
-/* TODO: add option to remove origins */
-
 function newOrigin(origin){
-	var ul = document.getElementById("origins");
-	var li = document.createElement("LI");
-	li.innerText = origin;
-	ul.appendChild(li);
+	if (originIsDisplayable(origin)){
+		var ul = document.getElementById("origins");
+		var li = document.createElement("LI");
+		var label = document.createElement("A");
+		var btn = document.createElement("BUTTON");
+		btn.classList.add("originListRemoveButton");
+		label.innerText = origin;
+		li.setAttribute("origin", origin);
+		li.appendChild(label);
+		li.appendChild(btn);
+		ul.appendChild(li);
+	}
 }
 
 /*
@@ -36,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	originsList.addEventListener("click",originsListDeleteHandler);
 
 	// Display current settings
-	chrome.storage.local.get(["DevTools"], function(result) {
+	platform.storage.local.get(["DevTools"], function(result) {
 		DevTools.checked   = result.DevTools;
 	});
 
@@ -60,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		for (var i = 0; i < originsLength; i++) {
 			newOrigin(permissions.origins[i]);
 		}
-		debugMessage("Obtained permissions: "+permissions.origins);
+		debugMessage("Obtained origins: "+permissions.origins);
 	});
 	
 	
@@ -69,9 +75,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function originsListDeleteHandler(evt){
 	if(evt.target && evt.target.nodeName == "LI") {
-		const origin = evt.target.innerHTML
+		const origin = evt.target.getAttribute("origin");
 		debugMessage(origin + " was clicked");
-		chrome.permissions.remove ({
+		platform.permissions.remove ({
 			origins: [origin]
 			}, function(removed) {
 				if (removed) {
@@ -87,13 +93,19 @@ function originsListDeleteHandler(evt){
 	}
 }
 
-/* TODO: create a function that would validate proposed origin format and/or rewrite it */
-/* TODO: append origin to the list only if it is new. Use platform.permissions.onAdded.addListener, may be? */
+/* TODO: create a function that would validate proposed origin format and/or rewrite it 
+*/
+
+/* TODO: append origin to the list only if it is new.
+ * Use platform.permissions.onAdded.addListener, may be?
+ * But Firefox says it is not supported...
+ */
 function addOrigin(origin){
 	debugMessage("form submitted, "+origin);
 	// Origin permission request
-	chrome.permissions.request({
-			origins: [origin]
+	try {
+		platform.permissions.request({
+			origins: [origin + "/"]
 			}, function(granted) {
 				// The callback argument will be true if the user granted the permissions.
 				if (granted) {
@@ -105,20 +117,21 @@ function addOrigin(origin){
 					debugMessage("ERROR: Origin is refused, " + origin);
 				}
 		});
+	} catch(error){/* Firefox throws error if origin is invalid, catch to prevent page reload */ }
 }
 
 /*
  * Process user's reques to enable/disable WebRequest integration.
  * If user disables integration, revoke the WebRequest permission.
  * If user enables integration, ask for the permission (handle rejections accordngly).
- * Docs say that "After a permission has been removed, calling permissions.request() usually adds the permission back without prompting the user." 
+ * Chrome Docs say that "After a permission has been removed, calling permissions.request() usually adds the permission back without prompting the user." Source: https://developer.chrome.com/apps/permissions
  */
 function choiceHandlerWebRequest(evt){
 	const checked = evt.target.checked;
-	chrome.storage.local.set({WebRequest: checked});
+	platform.storage.local.set({WebRequest: checked});
 	if (checked){
 		// WebRequest integration requested
-		chrome.permissions.request({
+		platform.permissions.request({
 			permissions: ["webRequest"]
 			}, function(granted) {
 				// The callback argument will be true if the user granted the permissions.
@@ -133,7 +146,7 @@ function choiceHandlerWebRequest(evt){
 	} else {
 		// WebRequest integration disabled
 		// Remove permission
-		chrome.permissions.remove ({
+		platform.permissions.remove ({
 			permissions: ["webRequest"]
 			}, function(removed) {
 				if (removed) {
@@ -154,7 +167,6 @@ function choiceHandlerWebRequest(evt){
  */
 function choiceHandlerDevTools(evt){
 	const checked = evt.target.checked;
-//	localStorage.setItem("DevTools", checked);
-	chrome.storage.local.set({DevTools: checked});
+	platform.storage.local.set({DevTools: checked});
 	debugMessage("DevTools clicked, set to " + checked);
 }

@@ -26,11 +26,16 @@
 	},
 	"background": {
 		"scripts": [
-				"background/cookiestore.js",
-				"background/inject.js"
+				"background/cookiestore.js"
 			],
 		"persistent": true
 	},
+   "content_scripts": [ {
+   "matches":["http://*/", "https://*/"],
+      "all_frames": true,
+      "js": [ "content_scripts/inject.js" ],
+      "run_at": "document_start"
+   } ],
 	"web_accessible_resources": [
 		"web_accessible_resources/*"
 	]

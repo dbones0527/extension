@@ -11,9 +11,7 @@
 	},
 	"permissions": [
 		"storage",
-		"cookies",
-		"tabs",
-		"webNavigation"
+		"cookies"
 	],
 	"optional_permissions": [
 		"webRequest",
@@ -30,12 +28,14 @@
 			],
 		"persistent": true
 	},
-   "content_scripts": [ {
-   "matches":["http://*/", "https://*/"],
-      "all_frames": true,
-      "js": [ "content_scripts/inject.js" ],
-      "run_at": "document_start"
-   } ],
+	"content_scripts": [
+		{
+			"matches":["http://*/", "https://*/"],
+			"all_frames": true,
+			"js": [ "content_scripts/inject.js" ],
+			"run_at": "document_start"
+		}
+	],
 	"web_accessible_resources": [
 		"web_accessible_resources/*"
 	]

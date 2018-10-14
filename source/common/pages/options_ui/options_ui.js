@@ -74,8 +74,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function originsListDeleteHandler(evt){
-	if(evt.target && evt.target.nodeName == "LI") {
-		const origin = evt.target.getAttribute("origin");
+	if(evt.target && evt.target.nodeName == "BUTTON" && evt.target.parentNode.nodeName == "LI") {
+		const origin = evt.target.parentNode.getAttribute("origin");
 		debugMessage(origin + " was clicked");
 		platform.permissions.remove ({
 			origins: [origin]
@@ -83,7 +83,7 @@ function originsListDeleteHandler(evt){
 				if (removed) {
 					// The permissions have been removed.
 					debugMessage(origin + " permission removed");
-					evt.target.parentNode.removeChild(evt.target);
+					evt.target.parentNode.parentNode.removeChild(evt.target.parentNode);
 				} else {
 					// The permissions have not been removed (e.g., you tried to remove
 					// required permissions).

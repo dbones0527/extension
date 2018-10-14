@@ -6,12 +6,15 @@ ul {
 	border-bottom: 1px solid silver;
 	height: 2em;
 	margin-right: 5%;
-	margin-top: 0.5em;
+	margin-top: 1em;
 }
 
 #origins > li > button {
 	height: 100%;
+	width: 2em;
 	float: right;
-	border-radius: 50%;
-    background: grey;
+	background-image: url("deleteButton.png");
+	background-size: cover;
+	background-position: center center;
+	border: none;
 }

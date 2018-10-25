@@ -11,7 +11,7 @@ platform.storage.local.get(["DevTools"], function(result) {
 	if (draw)
 	platform.devtools.panels.create("Cookie Saver",
 		"/img-t/img.png",
-		"/pages/popup/popup.html",
+		"/pages/devtools/inspector.html",
 		function cb(panel) {
 			panel.onShown.addListener(function(win){ win.focus(); });
 	});

@@ -1,10 +1,30 @@
-table, th, td {
-	border-collapse: collapse;
-    border: 1px solid black;
+body {
+	height: 600px;
+	width: 600px;
+	margin: 0;
+	padding: 0;
 }
-table > tbody > tr > td {
-	white-space: nowrap;
-	overflow: hidden;         /*/ <- this does seem to be required */
-	text-overflow: ellipsis;
-	max-width: 100px;
+
+#main-menu {
+	width: 50%;
+	height: 100%;
+	float: left;
+}
+
+#details {
+	width: 50%;
+	float: right;
+}
+
+.main-menu-item {
+	height: 33%;
+}
+
+.main-menu-item > h2 {
+	margin: 0;
+	padding: 0;	
+}
+
+.details-item {
+	display: none;
 }

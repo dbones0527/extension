@@ -4,38 +4,36 @@
     <title></title>
     <meta charset="utf-8"/>
     <link href="popup.css" rel="stylesheet"/>
-    <link href="/includes/table-resize-master/table-resize.css" rel="stylesheet"/>
     <script src="/platform.js" defer></script>
     <script src="popup.js" defer></script>
-    <script src="/cookies.js" defer></script>
-	<script src="/includes/table-resize-master/table-resize.js" defer></script>
   </head>
   <body>
-    <h1>Cookie Saver</h1>	
-	
-	<table id="example">
-    <tbody>
-        <tr>
-            <th>Title 1</th>
-            <th>Title 2</th>
-            <th>Title 3</th>
-            <th>Title 4</th>
-        </tr>
-        <tr>
-            <td>Column 1 Row 1</td>
-            <td>Column 1 Row 2</td>
-            <td>Column 1 Row 3</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Column 2 Row 1</td>
-            <td>Column 2 Row 2</td>
-            <td></td>
-            <td>Column 2 Row 3</td>
-        </tr>
-    </tbody>
-</table>
-	
-	
+
+    <div id="main-menu">
+      <div id="main-menu-monitoring" class="main-menu-item">
+        <h2>Monitoring</h2>
+      </div>
+      <div id="main-menu-sharing" class="main-menu-item">
+        <h2>Sharing</h2>
+      </div>
+      <div id="main-menu-protection" class="main-menu-item">
+        <h2>Protection</h2>
+      </div>
+    </div>
+    <div id="details">
+      <div id="details-default" class="details-item details-item--active">
+        <h2>You didn't choose anything yet</h2>
+      </div>
+      <div id="details-monitoring" class="details-item">
+        <h2>You chose Monitoring</h2>
+      </div>
+      <div id="details-sharing" class="details-item">
+        <h2>You chose Sharing</h2>
+      </div>
+      <div id="details-protection" class="details-item">
+        <h2>You chose Protection</h2>
+      </div>
+    </div>
+
   </body>
 </html>

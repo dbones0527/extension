@@ -3,6 +3,7 @@ body {
 	width: 600px;
 	margin: 0;
 	padding: 0;
+	font-family: sans-serif;
 }
 
 #main-menu {
@@ -17,16 +18,21 @@ body {
 }
 
 .main-menu-item {
-	height: 33%;
+	padding-left: 30px;
+	padding-right: 10px;
+	height: 33.333%;
+	transition: background-color 0.5s;
 }
 
 .main-menu-item--active {
-	color: red;
+	background-color: #ffcc66;
+	transition: background-color 0.5s;
 }
 
 .main-menu-item > h2 {
 	margin: 0;
-	padding: 0;	
+	padding: 5px;
+	padding-top: 10px;
 }
 
 .details-item {
@@ -36,4 +42,30 @@ body {
 .details-item--active {
 	display: block;
 	height: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#main-menu-protection-bar {
+	background-color: black;
+	border-radius: 13px;
+	/* (height of inner div) / 2 + padding */
+	padding: 3px;
+}
+
+#main-menu-protection-bar > div {
+	background-color: green;
+	width: 40%;
+	/* Adjust with JavaScript */
+	height: 20px;
+	border-radius: 10px;
 }

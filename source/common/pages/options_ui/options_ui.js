@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	// Attach all the click handlers
 	DevTools.addEventListener  ("click", choiceHandlerDevTools);
 	WebRequest.addEventListener("click", choiceHandlerWebRequest);
-	newOriginForm.onsubmit = function(evt) {addOrigin(evt.target.elements['newOrigin'].value);return false;};
+	newOriginForm.onsubmit = function(evt) {addOrigin(evt.target.elements["newOrigin"].value);return false;};
 	originsList.addEventListener("click",originsListDeleteHandler);
 
 	// Display current settings
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		var permissionsLength = permissions.permissions.length;
 		for (var i = 0; i < permissionsLength; i++) {
 			switch (permissions.permissions[i]){
-				case "webRequest":
+				case "webRequestBlocking":
 					WebRequest.checked = true;
 					break;
 				/* TODO: add every optional permission here */
@@ -132,7 +132,7 @@ function choiceHandlerWebRequest(evt){
 	if (checked){
 		// WebRequest integration requested
 		platform.permissions.request({
-			permissions: ["webRequest"]
+			permissions: ["webRequestBlocking"]
 			}, function(granted) {
 				// The callback argument will be true if the user granted the permissions.
 				if (granted) {
@@ -147,7 +147,7 @@ function choiceHandlerWebRequest(evt){
 		// WebRequest integration disabled
 		// Remove permission
 		platform.permissions.remove ({
-			permissions: ["webRequest"]
+			permissions: ["webRequestBlocking"]
 			}, function(removed) {
 				if (removed) {
 					// The permissions have been removed.

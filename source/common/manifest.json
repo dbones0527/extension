@@ -11,10 +11,11 @@
 	},
 	"permissions": [
 		"storage",
-		"cookies"
+		"cookies",
+		"webRequest",
+		"webRequestBlocking"
 	],
 	"optional_permissions": [
-		"webRequest",
 		"http://*/",
 		"https://*/"
 	],

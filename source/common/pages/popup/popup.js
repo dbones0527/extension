@@ -1,5 +1,15 @@
 "use strict";
 
+// Notify other pages (background) that popup is open
+platform.runtime.sendMessage({popupOpen: true})
+
+/*
+TODO: uncomment and figure out source of warnings
+window.addEventListener("unload", function(evt){
+	platform.runtime.sendMessage({popupOpen: false})
+	return true
+})*/
+
 const mainMenu = document.getElementById("main-menu")
 
 const mainMenuMonitoring = document.getElementById ("main-menu-monitoring")
@@ -20,6 +30,7 @@ function debugMessage(message){
 	div.innerText = message
 	document.body.appendChild(div)
 }
+
 
 document.addEventListener("DOMContentLoaded", function() {
 

@@ -1,8 +1,10 @@
-"use strict";
+"use strict"
 
 // Initialize the cookie database upon extension installation
 
-const platform = chrome;
+const platform = chrome
+
+const urlPopup = window.location.origin + "/pages/popup/popup.html"
 
 // TODO: make an actual datasructure.
 var cookieDatabase = {}
@@ -27,6 +29,24 @@ platform.runtime.onInstalled.addListener (function() {
 	platform.permissions.contains({permissions:["webRequestBlocking"]}, function(result){
 		if (result)
 			onPermissionWebRequestGranted()
+	})
+
+	// Listen for incomming messages form other pages (popup)
+	platform.runtime.onMessage.addListener(function(message, sender/*, sendResponse*/){
+/*	sender.envType takes on useful values "content_child" and "addon_child" */
+		switch (sender.url){
+			case urlPopup:
+				if(message.popupOpen === true) {
+					console.log("Popup open", sender, message)
+//					sendResponse(cookieDatabase)
+				}
+				if(message.popupOpen === false) {
+					console.log("Popup closed", sender, message)
+				}
+				break
+			default:
+				console.log("Unknown message", message, sender)
+		}
 	})
 })
 
@@ -70,7 +90,7 @@ function onPermissionWebRequestGranted(){
 	// TODO: Difference between "set-cookie" and "Set-Cookie"
 	// TODO: support protocols other than HTTP(S)
 	function watchCookiesSet(details){
-//		console.log(details)
+		//console.log(details)
 
 		// Get additional parameters
 		const protocol = details.url.substring(0, details.url.indexOf("://"))
@@ -80,7 +100,7 @@ function onPermissionWebRequestGranted(){
 				const name = value.substring(0, value.indexOf("="))
 					
 				console.log("Cookie set: ", name)
-				cookieDatabase[name] = {secureOrigin: protocol === "https", httpOrigin: true}
+				cookieDatabase[name] = {secureOrigin: protocol === "https", httpOnly: true}
 			}
 		} /*else {
 				console.log(details.responseHeaders[i].name)
@@ -88,11 +108,17 @@ function onPermissionWebRequestGranted(){
 		return {responseHeaders: details.responseHeaders}
 	}
 
+	function logError(details){
+		console.log("Network error, e.g. other extension blocked")
+	}
+
 	platform.webRequest.onBeforeSendHeaders.addListener (watchCookiesSent,
 		{urls: urls}, ["blocking", "requestHeaders"])
 
 	platform.webRequest.onHeadersReceived.addListener (watchCookiesSet,
 		{urls: urls}, ["blocking", "responseHeaders"])
+
+	platform.webRequest.onErrorOccurred.addListener(logError, {urls: urls})
 }
 
 function recordCookieChange(/*object*/ changeInfo){

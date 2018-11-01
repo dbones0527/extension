@@ -55,14 +55,14 @@ body {
 
 
 
-#main-menu-protection-bar {
+#main-menu-security-bar {
 	background-color: black;
 	border-radius: 13px;
 	/* (height of inner div) / 2 + padding */
 	padding: 3px;
 }
 
-#main-menu-protection-bar > div {
+#main-menu-security-bar > div {
 	background-color: green;
 	width: 40%;
 	/* Adjust with JavaScript */

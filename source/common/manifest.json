@@ -13,7 +13,8 @@
 		"storage",
 		"cookies",
 		"webRequest",
-		"webRequestBlocking"
+		"webRequestBlocking",
+		"tabs"
 	],
 	"optional_permissions": [
 		"http://*/",
@@ -39,5 +40,6 @@
 	],
 	"web_accessible_resources": [
 		"web_accessible_resources/*"
-	]
+	],
+	"content_security_policy": "default-src 'none'; style-src 'self'; script-src 'self'; connect-src 'none'; img-src 'none'"
 }

@@ -1,5 +1,46 @@
 "use strict"
 
+/*
+ * "Libraries" used by the background
+ * Ideally, these would be generic external libraries, but I didn't find them
+ */
+
+/*
+ * Parse HTTP Strict Transport Security response header
+ * @param   value - string from the header
+ * @returns object {"max-age": non-negative int, "includeSubDomains": boolean, "preload": boolean}
+ */
+function parseResponseHeaderStrictTransportSecurity (headerValue){
+	var parsedAttributes = {"maxAge": 0, "includeSubDomains": false, "preload": false}
+	const attributes = headerValue.split(";")
+	for (var attribute of attributes){
+		attribute = attribute.trim().toLowerCase()
+		if (attribute === "")
+			continue
+		if (attribute === "includesubdomains"){
+			parsedAttributes.includeSubDomains = true
+		} else
+		if (attribute === "preload"){
+			parsedAttributes.preload = true
+		} else
+		if (attribute.startsWith("max-age")){
+			var value = attribute.substr(attribute.indexOf('=')+1)
+			if (value[0] === '"' && value.slice(-1) === '"')
+				value = value.slice(1, -1)
+			// TODO: handle errors and negative ints
+			parsedAttributes.maxAge = Number(value)
+		} else {
+			// ignore everything else, as per RFC 6797
+			console.log("ATENTION: Parsing HSTS header, unexpected attribute '" + attribute + "' in header '" + headerValue + "'")
+		}
+	}
+	return parsedAttributes
+}
+
+/*
+ * End of "Libraries"
+ */
+
 // Initialize the cookie database upon extension installation
 
 const platform = chrome
@@ -7,7 +48,7 @@ const platform = chrome
 const urlPopup = window.location.origin + "/pages/popup/popup.html"
 
 // TODO: make an actual datasructure.
-var cookieDatabase = {}
+var cookieDatabase = {"example":"example"}
 
 var cookieObservations = {}
 
@@ -32,13 +73,23 @@ platform.runtime.onInstalled.addListener (function() {
 	})
 
 	// Listen for incomming messages form other pages (popup)
-	platform.runtime.onMessage.addListener(function(message, sender/*, sendResponse*/){
+	platform.runtime.onMessage.addListener(function(message, sender, sendResponse){
 /*	sender.envType takes on useful values "content_child" and "addon_child" */
 		switch (sender.url){
 			case urlPopup:
 				if(message.popupOpen === true) {
-					console.log("Popup open", sender, message)
-//					sendResponse(cookieDatabase)
+					console.log(message)
+					switch(message.popupTab){
+						case "general":
+							console.log("Popup open: General")
+							break
+						case "security":
+							console.log("Popup open: Security")
+							sendResponse(cookieDatabase)
+							break
+						default:
+							console.log("Error")
+					}
 				}
 				if(message.popupOpen === false) {
 					console.log("Popup closed", sender, message)
@@ -89,22 +140,31 @@ function onPermissionWebRequestGranted(){
 	 */
 	// TODO: Difference between "set-cookie" and "Set-Cookie"
 	// TODO: support protocols other than HTTP(S)
-	function watchCookiesSet(details){
-		//console.log(details)
+	function watchResponse(details){
+
+		console.log(details)
 
 		// Get additional parameters
 		const protocol = details.url.substring(0, details.url.indexOf("://"))
 		for (var i = 0; i < details.responseHeaders.length; ++i) {
-			if (details.responseHeaders[i].name === "set-cookie"){//"Set-Cookie") {
-				const value = details.responseHeaders[i].value
-				const name = value.substring(0, value.indexOf("="))
-					
-				console.log("Cookie set: ", name)
-				cookieDatabase[name] = {secureOrigin: protocol === "https", httpOnly: true}
+			const headerName = details.responseHeaders[i].name.toLowerCase()
+			const headerValue = details.responseHeaders[i].value
+			switch (headerName){
+				case "set-cookie":
+					const name = headerValue.substring(0, headerValue.indexOf("="))
+
+					console.log("Cookie set: ", name)
+					cookieDatabase[name] = {secureOrigin: protocol === "https", httpOnly: true}
+					break
+				case "strict-transport-security":
+					var hstsAttributes = parseResponseHeaderStrictTransportSecurity(headerValue)
+					console.log("HSTS", headerValue, hstsAttributes)
+					break
+				default:
+					// Header not interesting
 			}
-		} /*else {
-				console.log(details.responseHeaders[i].name)
-			}*/
+		}
+
 		return {responseHeaders: details.responseHeaders}
 	}
 
@@ -115,12 +175,25 @@ function onPermissionWebRequestGranted(){
 	platform.webRequest.onBeforeSendHeaders.addListener (watchCookiesSent,
 		{urls: urls}, ["blocking", "requestHeaders"])
 
-	platform.webRequest.onHeadersReceived.addListener (watchCookiesSet,
+	platform.webRequest.onHeadersReceived.addListener (watchResponse,
 		{urls: urls}, ["blocking", "responseHeaders"])
 
 	platform.webRequest.onErrorOccurred.addListener(logError, {urls: urls})
 }
 
 function recordCookieChange(/*object*/ changeInfo){
-	chrome.storage.local.set({last: changeInfo.cookie, lastReason: changeInfo.cause})
+	platform.storage.local.set({last: changeInfo.cookie, lastReason: changeInfo.cause})
 }
+
+
+
+
+
+console.log(parseResponseHeaderStrictTransportSecurity("max-age=31536000"))
+
+
+console.log(parseResponseHeaderStrictTransportSecurity("max-age=15768000 ; includeSubDomains"))
+
+console.log(parseResponseHeaderStrictTransportSecurity("max-age=\"31536000\""))
+console.log(parseResponseHeaderStrictTransportSecurity("max-age=0"))
+console.log(parseResponseHeaderStrictTransportSecurity("max-age=0; includeSubDomains"))

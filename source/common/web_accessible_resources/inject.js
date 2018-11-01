@@ -12,9 +12,9 @@ function sendMessage(message){
 /*
  * Function processing cookie during retreival
  */
-function processCookieString(cookieString){
+function processGetCookieString(cookieString){
 	console.log("Cookie read: ", cookieString)
-	sendMessage({"event": "read"})
+//	sendMessage({"event": "read"})
 	return cookieString
 }
 
@@ -23,7 +23,7 @@ function processCookieString(cookieString){
  */
 function processSetCookieStr(cookieString){
 	console.log("Cookie set: ", cookieString)
-	sendMessage({"event": "write", "cookie": cookieString})
+//	sendMessage({"event": "write", "cookie": cookieString})
 	return cookieString
 }
 
@@ -35,7 +35,7 @@ var cookieSetter = document.__lookupSetter__("cookie").bind(document)
 
 Object.defineProperty (document, "cookie", {
 	get: function() {
-		return processCookieString (cookieGetter())
+		return processGetCookieString (cookieGetter())
 	},
 
 	set: function(cookieString) {

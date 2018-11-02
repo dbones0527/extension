@@ -2,7 +2,9 @@
 
 "use strict";
 
-const platform = chrome;
+module.exports = {platform: chrome}
+
+//const platform = chrome;
 
 /* Firefox and Chromium provide that same WebExtensions API,
  * but Chromium calls it 'chrome.cookies' (because they invented it),

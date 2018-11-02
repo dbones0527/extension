@@ -3,6 +3,8 @@
 /*
  * "Libraries" used by the background
  * Ideally, these would be generic external libraries, but I didn't find them
+ * TODO: Separate this into a module
+ * TODO: Webpack https://www.reddit.com/r/webdev/comments/3rdwll/npm_makes_no_sense_to_me/
  */
 
 /*
@@ -112,7 +114,9 @@ function onPermissionWebRequestGranted(){
 	 * Observe the Cookie header containing cookies being sent to the server
 	 */
 	function watchCookiesSent(details){
-		const protocol = details.url.substring(0, details.url.indexOf("://"))
+//		console.log("Request", details)
+
+		const protocol = new URL(details.url).protocol
 		for (var i = 0; i < details.requestHeaders.length; ++i) {
 			if (details.requestHeaders[i].name === "Cookie") {
 				const cookies = details.requestHeaders[i].value.split("; ")
@@ -122,8 +126,8 @@ function onPermissionWebRequestGranted(){
 					const name = cookie.substr(0, index)
 					const value = cookie.substr(index + 1)
 
-					if (protocol === "http" && (cookieDatabase[name] === undefined || cookieDatabase[name].secureOrigin === true)){
-						console.log("LEAK", name)
+					if (protocol === "http:" && (cookieDatabase[name] === undefined || cookieDatabase[name].secureOrigin === true)){
+						console.log("LEAK", name, value, cookie)
 					}
 //					console.log("Cookie sent: ", cookie, name, value)
 //					if (details.initiator.startsWith
@@ -142,23 +146,47 @@ function onPermissionWebRequestGranted(){
 	// TODO: support protocols other than HTTP(S)
 	function watchResponse(details){
 
-		console.log(details)
+//		console.log("Response", details)
 
 		// Get additional parameters
-		const protocol = details.url.substring(0, details.url.indexOf("://"))
+		const protocol = new URL(details.url).protocol
 		for (var i = 0; i < details.responseHeaders.length; ++i) {
 			const headerName = details.responseHeaders[i].name.toLowerCase()
 			const headerValue = details.responseHeaders[i].value
 			switch (headerName){
 				case "set-cookie":
 					const name = headerValue.substring(0, headerValue.indexOf("="))
-
+// Options:
+// Better: https://www.npmjs.com/package/cookie
+// Alternative: https://www.npmjs.com/package/set-cookie-parser
 					console.log("Cookie set: ", name)
-					cookieDatabase[name] = {secureOrigin: protocol === "https", httpOnly: true}
+					cookieDatabase[name] = {secureOrigin: protocol === "https:", httpOnly: true}
 					break
+
 				case "strict-transport-security":
 					var hstsAttributes = parseResponseHeaderStrictTransportSecurity(headerValue)
 					console.log("HSTS", headerValue, hstsAttributes)
+					break
+// Options: did not find any, had to write my own
+				case "content-security-policy":
+// Options:
+// https://www.npmjs.com/package/content-security-policy-parser
+//   This one has issues with "block-all-mixed-content", which is important for us https://github.com/helmetjs/content-security-policy-parser/issues/1
+//
+// https://www.npmjs.com/package/csp-serdes
+// Looks abandoned, but might be useful
+//
+// https://www.npmjs.com/package/csp-parse
+// Parses just CSP keys, but not values/directives
+//
+// https://www.npmjs.com/package/makestatic-parse-csp
+// Don't know how it works
+					//upgrade-insecure-requests
+					console.log("CSP", headerValue)
+					break
+				case "x-content-security-policy":
+				case "x-webkit-csp":
+					console.log("CSP Information: " + details.responseHeaders[i].name + " is deprecated and is known to cause problems. https://content-security-policy.com/111")
 					break
 				default:
 					// Header not interesting

@@ -1,5 +1,7 @@
 "use strict";
 
+const platform = chrome
+
 // Notify other pages (background) that popup is open
 platform.runtime.sendMessage({popupOpen: true, popupTab: "general"})
 

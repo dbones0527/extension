@@ -37,9 +37,7 @@ const base = "./source/common/"
 const files = [
 	"background/cookiestore.js",
 	"content_scripts/inject.js",
-	"web_accessible_resources/inject.js",
-	"cookies.js",
-	"platform.js",
+	"web_accessible_resources/inject.js"
 ]
 
 var entries = {}

@@ -88,16 +88,14 @@ Nothing can be private unless it is secure, therefore this extension
 takes the following precautions:
  - Uses the least API permissions possible
  - Reasonable CSP
- - 
 
 ## Building
 
-`Makefile` provides recipes for building unpacked builds.
-TODO: Packing builds?
+The extension relies on `npm` modules and `webpack` for building.
 
 ## Dependencies
 
-Please refer to "Folder structure" `/common/includes/*`
+This extesion uses the following `npm` modules: *TODO: WRITE WHICH ONES*
 
 ## Folder structure
 
@@ -105,13 +103,15 @@ Please refer to "Folder structure" `/common/includes/*`
    - `source/common/*` contains code shared among all WebExtension extensions
      - `source/common/background/*` contains all background scripts
        - `source/common/background/cookiestore.js` maintains the cookie database
-     - `source/common/includes/*` contains all the ouside dependencies
-       - table-resize, `/includes/table-resize.js`, https://github.com/irhc/table-resize; Licensed under MIT (c) irhc and others.
-       - JavaScript Cookie, `/includes/js.cookie-*.min.js`, helps with Chromium `chrome.cookies` Cookie API
      - `source/common/pages/*` contains all the interfaces
+     - `source/common/content_scripts/*` contains all the code 
+	 interacting with the page from its own context
+     - `source/common/web_accessible_resources/*` contains all the 
+	 code injected into the page context
    - `source/chromium/*` contains Chromium-specific code
    - `source/firefox/*` contains Firefox-specific code
  - `build/*` contains all the builds generated from the source code
+ - `node_modules/*` is the land of `npm`, don't go there
 
 ## Minimum browser requirements
 

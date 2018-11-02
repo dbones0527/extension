@@ -1,19 +1,14 @@
-"use strict";
+"use strict"
 
 /*
  * For debug purposes only. This displays the "message" within the UI.
  */
 function debugMessage(message){
-	var div = document.createElement("DIV");
-	div.innerText = message;
-	document.body.appendChild(div);
+	var div = document.createElement("DIV")
+	div.innerText = message
+	document.body.appendChild(div)
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-	platform.cookies.getAll({
-  domain: ".com"
-}, function (cookies) {
-  document.body.appendChild(createCookieTable (cookies));
-});
-	
-});
+document.addEventListener("DOMContentLoaded", function() {
+
+})

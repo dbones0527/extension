@@ -9,21 +9,24 @@
   <body>
 
     <div id="main-menu">
-      <div id="main-menu-monitoring" class="main-menu-item">
-        <h2>Monitoring</h2>
+      <div id="main-menu-consequences" class="main-menu-item main-menu-item-small">
+        <h2>Cosnsequences</h2>
       </div>
-      <div id="main-menu-sharing" class="main-menu-item">
-        <h2>Sharing</h2>
+      <div id="main-menu-monitoring" class="main-menu-item main-menu-item-large">
+        <h2>Monitoring<img alt="?" class="info" src="/includes/fontawesome/info-circle-solid.svg"></h2>
       </div>
-      <div id="main-menu-security" class="main-menu-item">
-        <h2>Security</h2>
-        <div id="main-menu-security-bar">
-          <div></div>
-        </div>
+      <div id="main-menu-sharing" class="main-menu-item main-menu-item-large">
+        <h2>Sharing<img alt="?" class="info" src="/includes/fontawesome/info-circle-solid.svg"></h2>
+      </div>
+      <div id="main-menu-security" class="main-menu-item main-menu-item-large">
+        <h2>Security<img alt="?" class="info" src="/includes/fontawesome/info-circle-solid.svg"></h2>
       </div>
     </div>
     <div id="details">
-      <div id="details-default" class="details-item details-item--active">
+      <div id="details-consequences" class="details-item">
+        <h2>You chose Consequences</h2>
+      </div>
+      <div id="details-default" class="details-item">
         <h2>You didn't choose anything yet</h2>
       </div>
       <div id="details-monitoring" class="details-item">
@@ -34,14 +37,30 @@
       </div>
       <div id="details-security" class="details-item">
         <h2>You chose Security</h2>
-		<p>Enebling some of these options may break the site functionality. In that case, you might have to revert back.</p>
-		<ul id="details-security-list">
-		<li><a>gog-al</a> <input type="checkbox"> </li>
-		<li><a>gog_lc</a> <input type="checkbox"> </li>
-		<li><a>gog_set</a> <input type="checkbox"> </li>
-		<li><a>gog_us</a> <input type="checkbox"> </li>
-		</ul>
-		<button type="button">Protect all</button
+        <div>
+          <select name="site">
+            <option value="" disabled selected hidden>Site</option>
+            <option value="any">Any</option>
+          </select>
+          <select name="security">
+            <option value="" disabled selected hidden>Security</option>
+            <option value="any">Any</option>
+            <option value="safe">Secure by default</option>
+            <option value="enabled">Under protection</option>
+            <option value="disabled">Vulnerable</option>
+            <option value="insecure">Insecure</option>
+          </select>
+          <select name="severity">
+            <option value="" disabled selected hidden>Severity</option>
+            <option value="any">Any</option>
+            <option value="">Tempering possible</option>
+            <option value="volvo">Tempering detected</option>
+            <option value="confideniality">Snooping possible</option>
+            <option value="leak">Leak detected</option>
+          </select>
+        </div>
+		<p>Enabling some of these options may break the site functionality. In that case, you might have to revert back.</p>
+		<ul id="details-security-list"></ul>
       </div>
     </div>
 

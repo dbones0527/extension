@@ -1,58 +1,19 @@
 "use strict"
 
-/*
- * "Libraries" used by the background
- * Ideally, these would be generic external libraries, but I didn't find them
- * TODO: Separate this into a module
- * TODO: Webpack https://www.reddit.com/r/webdev/comments/3rdwll/npm_makes_no_sense_to_me/
- */
+const platform = require("../libraries/platform").platform
 
-/*
- * Parse HTTP Strict Transport Security response header
- * @param   value - string from the header
- * @returns object {"max-age": non-negative int, "includeSubDomains": boolean, "preload": boolean}
- */
-function parseResponseHeaderStrictTransportSecurity (headerValue){
-	var parsedAttributes = {"maxAge": 0, "includeSubDomains": false, "preload": false}
-	const attributes = headerValue.split(";")
-	for (var attribute of attributes){
-		attribute = attribute.trim().toLowerCase()
-		if (attribute === "")
-			continue
-		if (attribute === "includesubdomains"){
-			parsedAttributes.includeSubDomains = true
-		} else
-		if (attribute === "preload"){
-			parsedAttributes.preload = true
-		} else
-		if (attribute.startsWith("max-age")){
-			var value = attribute.substr(attribute.indexOf('=')+1)
-			if (value[0] === '"' && value.slice(-1) === '"')
-				value = value.slice(1, -1)
-			// TODO: handle errors and negative ints
-			parsedAttributes.maxAge = Number(value)
-		} else {
-			// ignore everything else, as per RFC 6797
-			console.log("ATENTION: Parsing HSTS header, unexpected attribute '" + attribute + "' in header '" + headerValue + "'")
-		}
-	}
-	return parsedAttributes
-}
+const cookie = require("cookie")
 
-/*
- * End of "Libraries"
- */
+const parseResponseHeaderStrictTransportSecurity = require("../libraries/hsts/hsts").parseResponseHeaderStrictTransportSecurity
 
 // Initialize the cookie database upon extension installation
-
-const platform = chrome
 
 const urlPopup = window.location.origin + "/pages/popup/popup.html"
 
 // TODO: make an actual datasructure.
 var cookieDatabase = {"example":"example"}
 
-var cookieObservations = {}
+var tabObservations = {}
 
 /*
  * Prepare datastructures of the newly installed extension
@@ -86,8 +47,8 @@ platform.runtime.onInstalled.addListener (function() {
 							console.log("Popup open: General")
 							break
 						case "security":
-							console.log("Popup open: Security")
-							sendResponse(cookieDatabase)
+							console.log("Popup open: Security", tabObservations)
+							sendResponse(tabObservations[message.tab])
 							break
 						default:
 							console.log("Error")
@@ -111,31 +72,48 @@ function onPermissionWebRequestGranted(){
 	const urls = ["http://*/*", "https://*/*"]
 
 	/*
+	 * Remembers observations about tabs (pages)
+	 */
+	function rememberTabObservation(request, observation){
+		const tabId = request.tabId, originUrl = request.originUrl, resource = request.url, parentFrameId = request.parentFrameId
+		console.log("New observation", request)
+		// if no record exists, create one; if record is tied to different origin, assume it is a different page
+		// TODO: is the above assumption correct for, e.g., SPA?
+		const newPage = false//typeof tabObservations[tabId] === "object" && parentFrameId !== -1 && tabObservations[tabId].originUrl !== originUrl
+		if (tabObservations[tabId] === undefined || newPage)
+			tabObservations[tabId] = {originUrl: originUrl, observations:{}}
+
+		var resourceHost = new URL(resource).host
+		if (tabObservations[tabId].observations[resourceHost] === undefined)
+			tabObservations[tabId].observations[resourceHost] = []
+		tabObservations[tabId].observations[resourceHost].push(observation)
+		console.log("New observation logged", tabObservations)
+	}
+
+	/*
 	 * Observe the Cookie header containing cookies being sent to the server
 	 */
 	function watchCookiesSent(details){
-//		console.log("Request", details)
+		console.log("Request")
+		var observations = []
 
 		const protocol = new URL(details.url).protocol
 		for (var i = 0; i < details.requestHeaders.length; ++i) {
 			if (details.requestHeaders[i].name === "Cookie") {
-				const cookies = details.requestHeaders[i].value.split("; ")
-				for (var cookie of cookies){
-					// Split the cookie in name and value
-					const index = cookie.indexOf("=")
-					const name = cookie.substr(0, index)
-					const value = cookie.substr(index + 1)
+				const parsed = cookie.parse(details.requestHeaders[i].value)
 
-					if (protocol === "http:" && (cookieDatabase[name] === undefined || cookieDatabase[name].secureOrigin === true)){
-						console.log("LEAK", name, value, cookie)
-					}
-//					console.log("Cookie sent: ", cookie, name, value)
-//					if (details.initiator.startsWith
+				observations.push({type: "Cookie", content: "Cookie sent: " + parsed})
+
+/*				if (protocol === "http:" && (cookieDatabase[name] === undefined || cookieDatabase[name].secureOrigin === true)){
+					console.log("LEAK", name, value, parsed)
 				}
-//				details.requestHeaders.splice(i, 1);
+*/
 				break
 			}
 		}
+
+		rememberTabObservation(details, observations)
+		console.log("Request processed")
 		return {requestHeaders: details.requestHeaders}
 	}
 
@@ -146,7 +124,8 @@ function onPermissionWebRequestGranted(){
 	// TODO: support protocols other than HTTP(S)
 	function watchResponse(details){
 
-//		console.log("Response", details)
+		console.log("Response")
+		var observations = []
 
 		// Get additional parameters
 		const protocol = new URL(details.url).protocol
@@ -156,16 +135,13 @@ function onPermissionWebRequestGranted(){
 			switch (headerName){
 				case "set-cookie":
 					const name = headerValue.substring(0, headerValue.indexOf("="))
-// Options:
-// Better: https://www.npmjs.com/package/cookie
-// Alternative: https://www.npmjs.com/package/set-cookie-parser
-					console.log("Cookie set: ", name)
+					observations.push({type: "Cookie", content: "Cookie set: "+name})
 					cookieDatabase[name] = {secureOrigin: protocol === "https:", httpOnly: true}
 					break
 
 				case "strict-transport-security":
 					var hstsAttributes = parseResponseHeaderStrictTransportSecurity(headerValue)
-					console.log("HSTS", headerValue, hstsAttributes)
+					observations.push({type: "HSTS", content: [headerValue, hstsAttributes]})
 					break
 // Options: did not find any, had to write my own
 				case "content-security-policy":
@@ -182,17 +158,21 @@ function onPermissionWebRequestGranted(){
 // https://www.npmjs.com/package/makestatic-parse-csp
 // Don't know how it works
 					//upgrade-insecure-requests
-					console.log("CSP", headerValue)
+					observations.push({type: "CSP", content: headerValue})
 					break
 				case "x-content-security-policy":
+					// fallthrough
 				case "x-webkit-csp":
-					console.log("CSP Information: " + details.responseHeaders[i].name + " is deprecated and is known to cause problems. https://content-security-policy.com/111")
+					const message = "CSP Information: " + details.responseHeaders[i].name + " is deprecated and is known to cause problems. https://content-security-policy.com/111"
+					observations.push({type: "Warning", content: message})
 					break
 				default:
 					// Header not interesting
 			}
 		}
-
+		rememberTabObservation(details, observations)
+		console.log ("Observations", details, observations)
+		console.log("Response processed")
 		return {responseHeaders: details.responseHeaders}
 	}
 
@@ -212,16 +192,3 @@ function onPermissionWebRequestGranted(){
 function recordCookieChange(/*object*/ changeInfo){
 	platform.storage.local.set({last: changeInfo.cookie, lastReason: changeInfo.cause})
 }
-
-
-
-
-
-console.log(parseResponseHeaderStrictTransportSecurity("max-age=31536000"))
-
-
-console.log(parseResponseHeaderStrictTransportSecurity("max-age=15768000 ; includeSubDomains"))
-
-console.log(parseResponseHeaderStrictTransportSecurity("max-age=\"31536000\""))
-console.log(parseResponseHeaderStrictTransportSecurity("max-age=0"))
-console.log(parseResponseHeaderStrictTransportSecurity("max-age=0; includeSubDomains"))

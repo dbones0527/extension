@@ -11,3 +11,6 @@
 * Options UI can be too tall (long vertically) for the provided pace. In that case, window can't resolve th right heght and scroll thing and just starts shaking. Fixed by setting body{height:700px}.
 
 tabs is not necessary for Chrome
+
+Automatically rebuild and reload extesnion when source changes.
+https://www.reddit.com/r/webdev/comments/3rdwll/npm_makes_no_sense_to_me/

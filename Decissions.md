@@ -16,3 +16,8 @@ synchronous (blocking). Currently, extension blocks on `webRequest`
 to maintain the smallest amount of internal datastructures. So far, 
 I didn't see any slowdowns. However, this is a known *tradeoff*, 
 which will be reversed if needed.
+
+### `npm` modules
+
+ - For cookie I use [`cookie`](https://www.npmjs.com/package/cookie) module.
+   A good alternative would be [`set-cookie-parser`]( https://www.npmjs.com/package/set-cookie-parser)

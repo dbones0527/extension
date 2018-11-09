@@ -10,6 +10,7 @@ body {
 	width: 50%;
 	height: 100%;
 	float: left;
+	background-color: #eeeeee;
 }
 
 #details {
@@ -20,9 +21,14 @@ body {
 }
 
 .main-menu-item {
-	padding-left: 30px;
+	padding-left: 10px;
 	padding-right: 10px;
 	transition: background-color 0.5s;
+}
+
+.main-menu-item:not(.main-menu-item--active):hover {
+	background-color: #ffe6b3;
+	transition: background-color 0.1s;
 }
 
 .main-menu-item-small {
@@ -44,7 +50,7 @@ body {
 	padding-top: 10px;
 }
 
- h2 {
+h2 {
 	margin: 0;
 	padding: 5px;
 	padding-top: 10px;

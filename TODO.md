@@ -14,3 +14,7 @@ tabs is not necessary for Chrome
 
 Automatically rebuild and reload extesnion when source changes.
 https://www.reddit.com/r/webdev/comments/3rdwll/npm_makes_no_sense_to_me/
+
+
+
+https://stackoverflow.com/questions/1188581/how-to-make-an-html-div-element-editable-cross-browser

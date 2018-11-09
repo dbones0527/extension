@@ -13,6 +13,12 @@ const urlPopup = window.location.origin + "/pages/popup/popup.html"
 // TODO: make an actual datasructure.
 var cookieDatabase = {"example":"example"}
 
+
+/* Structure of tabObservations is as follows:
+	tabObservations is a dictionaty with keys tabId and values
+		objects:	originUrl (string)
+					observations - array of arrays of observations
+*/
 var tabObservations = {}
 
 /*
@@ -64,7 +70,6 @@ platform.runtime.onInstalled.addListener (function() {
 	})
 })
 
-
 /*
  * Observe the network activity around coookies
  */
@@ -76,7 +81,7 @@ function onPermissionWebRequestGranted(){
 	 */
 	function rememberTabObservation(request, observation){
 		const tabId = request.tabId, originUrl = request.originUrl, resource = request.url, parentFrameId = request.parentFrameId
-		console.log("New observation", request)
+//		console.log("New observation", request)
 		// if no record exists, create one; if record is tied to different origin, assume it is a different page
 		// TODO: is the above assumption correct for, e.g., SPA?
 		const newPage = false//typeof tabObservations[tabId] === "object" && parentFrameId !== -1 && tabObservations[tabId].originUrl !== originUrl
@@ -87,14 +92,14 @@ function onPermissionWebRequestGranted(){
 		if (tabObservations[tabId].observations[resourceHost] === undefined)
 			tabObservations[tabId].observations[resourceHost] = []
 		tabObservations[tabId].observations[resourceHost].push(observation)
-		console.log("New observation logged", tabObservations)
+//		console.log("New observation logged", tabObservations)
 	}
 
 	/*
 	 * Observe the Cookie header containing cookies being sent to the server
 	 */
 	function watchCookiesSent(details){
-		console.log("Request")
+//		console.log("Request")
 		var observations = []
 
 		const protocol = new URL(details.url).protocol
@@ -102,7 +107,7 @@ function onPermissionWebRequestGranted(){
 			if (details.requestHeaders[i].name === "Cookie") {
 				const parsed = cookie.parse(details.requestHeaders[i].value)
 
-				observations.push({type: "Cookie", content: "Cookie sent: " + parsed})
+				observations.push({type: "Cookie", content: "Cookie sent: " + details.requestHeaders[i].value})
 
 /*				if (protocol === "http:" && (cookieDatabase[name] === undefined || cookieDatabase[name].secureOrigin === true)){
 					console.log("LEAK", name, value, parsed)
@@ -113,7 +118,7 @@ function onPermissionWebRequestGranted(){
 		}
 
 		rememberTabObservation(details, observations)
-		console.log("Request processed")
+//		console.log("Request processed")
 		return {requestHeaders: details.requestHeaders}
 	}
 
@@ -124,7 +129,7 @@ function onPermissionWebRequestGranted(){
 	// TODO: support protocols other than HTTP(S)
 	function watchResponse(details){
 
-		console.log("Response")
+//		console.log("Response")
 		var observations = []
 
 		// Get additional parameters
@@ -171,8 +176,8 @@ function onPermissionWebRequestGranted(){
 			}
 		}
 		rememberTabObservation(details, observations)
-		console.log ("Observations", details, observations)
-		console.log("Response processed")
+//		console.log ("Observations", details, observations)
+//		console.log("Response processed")
 		return {responseHeaders: details.responseHeaders}
 	}
 

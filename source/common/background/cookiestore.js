@@ -48,13 +48,13 @@ platform.runtime.onInstalled.addListener (function() {
 			case urlPopup:
 				if(message.popupOpen === true) {
 					console.log(message)
-					switch(message.popupTab){
+					switch(message.popupSection){
 						case "general":
 							console.log("Popup open: General")
 							break
 						case "security":
 							console.log("Popup open: Security", tabObservations)
-							sendResponse(tabObservations[message.tab])
+							sendResponse(tabObservations[message.tabId])
 							break
 						default:
 							console.log("Error")

@@ -1,9 +1,9 @@
-"use strict";
+"use strict"
 
 const platform = chrome
 
 // Notify other pages (background) that popup is open
-platform.runtime.sendMessage({popupOpen: true, popupTab: "general"})
+platform.runtime.sendMessage({popupOpen: true, popupSection: "general"})
 
 /*
 TODO: uncomment and figure out source of warnings
@@ -12,19 +12,8 @@ window.addEventListener("unload", function(evt){
 	return true
 })*/
 
-const mainMenu = document.getElementById("main-menu")
-
-const mainMenuBroken = document.getElementById ("main-menu-broken")
-const mainMenuMonitoring = document.getElementById ("main-menu-monitoring")
-const mainMenuSharing = document.getElementById ("main-menu-sharing")
-const mainMenuSecurity = document.getElementById ("main-menu-security")
-
-const detailsDefault = document.getElementById ("details-default")
-
-const detailsMonitoring = document.getElementById ("details-monitoring")
-const detailsSharing = document.getElementById ("details-sharing")
-const detailsSecurity = document.getElementById ("details-security")
-const detailsBroken = document.getElementById ("main-menu-broken")
+// pointer to the button of the currwntly selected section
+var activeSection = null
 
 /*
  * For debug purposes only. This displays the "message" within the UI.
@@ -35,16 +24,21 @@ function debugMessage(message){
 	document.body.appendChild(div)
 }
 
-/* Create nested list */
-function nestedList(information){
-	function listEdit(evt) {
+/*
+ * Create nested list with editable labels (optional)
+ */
+function nestedList(information, editable){
+	/*
+	 * Edit label of list entry
+	 */
+	function editLabel(evt) {
 		var elem = evt.target
+		// Ignore clicks outside of button
 		if (elem.nodeName === "BUTTON"){
 			var editable = elem.parentNode.getElementsByTagName("A")[0]
 			editable.contentEditable="true"
 			editable.focus()
 		}
-		console.log("jhhvhvhjvvh")
 	}
 
 	// make sure object is well-formed
@@ -60,14 +54,19 @@ function nestedList(information){
 	if (typeof information !== "object")
 		return
 
+	// Create list
 	var list = document.createElement("UL")
-	list.addEventListener("click", listEdit)
+	// Add edit event handler
+	if (editable !== false)
+		list.addEventListener("click", editLabel)
 
+	// Create LI element with specified label and, optionally, edit button
 	function createElement(label_text, editable){
 		var elem = document.createElement("LI")
 		var label = document.createElement("A")
 		label.innerText = label_text
 		elem.appendChild(label)
+		// If element label is editable, create button for editing it
 		if (editable !== false){
 			var btn = document.createElement("BUTTON")
 			btn.innerText = "edit"
@@ -81,7 +80,7 @@ function nestedList(information){
 		console.log("List:  === ")
 		for (const info of information){
 			console.log("List:  === for ")
-			var elem = createElement(info)
+			var elem = createElement(info, editable)
 			list.appendChild(elem)
 		}
 	} else {
@@ -89,7 +88,7 @@ function nestedList(information){
 			console.log("List:  !==")
 		for (const info in information){
 			console.log("List:  !== for ")
-			var elem = createElement(info)
+			var elem = createElement(info, editable)
 			elem.appendChild(nestedList(information[info]))
 			list.appendChild(elem)
 		}
@@ -98,67 +97,73 @@ function nestedList(information){
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+	function displaySectionPrimary(information) {}
+	function displaySectionThirdparty(information) {}
+	function displaySectionSecurity(information) {
+		console.log("Inforinformation", information)
+		const list = document.getElementById("details-" + "security" + "-list")
+
+		// TODO: avoid complete list re-creation,
+		// since it looses information about open and closed sublists
+		const listNew = nestedList(information.observations)
+		list.replaceWith(listNew)
+		console.log("background script sent a response:", information)
+	}
+	function displaySectionDebugging(information) {}
 
 	// When main menu item is clicked, open the corresponding page
-	mainMenu.addEventListener("click", function(evt) {
+	document.getElementById("main-menu").addEventListener("click", function(evt) {
 		var elem = evt.target
+		// Find the main-menu-item, if click occured on its child
 		while (elem !== undefined && elem !== null){
 			if (elem.classList !== undefined && elem.classList.contains("main-menu-item")){
-				// Found the main-menu-item
-				mainMenuBroken.classList.remove("main-menu-item--active")
-				mainMenuMonitoring.classList.remove("main-menu-item--active")
-				mainMenuSharing.classList.remove("main-menu-item--active")
-				mainMenuSecurity.classList.remove("main-menu-item--active")
-				elem.classList.add("main-menu-item--active")
-
-				detailsDefault.classList.remove("details-item--active")
-				detailsBroken.classList.remove("details-item--active")
-				detailsMonitoring.classList.remove("details-item--active")
-				detailsSharing.classList.remove("details-item--active")
-				detailsSecurity.classList.remove("details-item--active")
-
 				// Extract "[selection]" from "main-menu-[selection]"
-				const selection = elem.id.substring("main-menu-".length)
+				const selectionNew = elem.id.substring("main-menu-".length)
+
+				// PREPARE THE NEWLY SELECTED SECTION TAB
+				// TODO: live update of all information
+				platform.tabs.query({active: true, currentWindow: true }, function(activeTabs){
+					const tabId = activeTabs[0].id
+					console.log(activeTabs)
+					const message = {popupOpen: true, popupSection: selectionNew, tabId: tabId}
+
+					function handleError(error) {
+						console.log("Error:", error)
+					}
+
+					// Firefox:
+					//		platform.runtime.sendMessage(message).then(displayCookies, handleError)
+
+					// Chrome:
+					switch(selectionNew){
+						case "security":
+							platform.runtime.sendMessage(message, displaySectionSecurity)
+							break
+						default:
+							console.log("Error")
+					}
+
+				})
+
+				// SWITCH TO THE NEWLY SELECTED SECTION TAB
+				// If some section was previously selected, unselect its button and hide details
+				if (activeSection !== null){
+					// From previously selected item remove acive label
+					activeSection.classList.remove("main-menu-item--active")
+					// Extract "[selection]" from "main-menu-[selection]"
+					const selectionLast = activeSection.id.substring("main-menu-".length)
+					document.getElementById ("details-" + selectionLast).classList.remove("details-item--active")
+				}
+				// Mark newly selected item active
+				elem.classList.add("main-menu-item--active")
 				// Make the details of seleced section visible
-				document.getElementById ("details-" + selection).classList.add("details-item--active")
+				document.getElementById ("details-" + selectionNew).classList.add("details-item--active")
+				// Remember current selection
+				activeSection = elem
 				break
 			} else {
 				elem = elem.parentNode
 			}
 		}
-	})
-
-	/* Construct the "Security" details pane */
-	mainMenuSecurity.addEventListener("click", function(evt){
-		// TODO: live update of all information
-		chrome.tabs.query({active: true, currentWindow: true }, function(activeTabs){
-			const tabId = activeTabs[0].id
-			console.log(activeTabs)
-			const message = {popupOpen: true, popupTab: "security", tab: tabId}
-
-			function displayCookies(information) {
-				console.log("Inforinformation", information)
-				const list = document.getElementById("details-security-list")
-
-				// TODO: avoid complete list re-creation,
-				// since it looses information about open and closed sublists
-				const listNew = nestedList(information.observations)
-				list.replaceWith(listNew)
-				console.log("background script sent a response:", information)
-			}
-
-			function handleError(error) {
-				console.log("Error:", error)
-			}
-
-			// Firefox:
-			//		platform.runtime.sendMessage(message).then(displayCookies, handleError)
-
-			// Chrome:
-			platform.runtime.sendMessage(message,displayCookies)
-
-		})
-
-
 	})
 })

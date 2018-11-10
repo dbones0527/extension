@@ -1,0 +1,24 @@
+{
+  "name": "cookie-policy",
+  "version": "0.0.0",
+  "description": "*NOTE*: It's early on in the development process, so a lot can and will change.",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "cookie": "^0.3.1"
+  },
+  "devDependencies": {
+    "ncp": "^2.0.0",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2"
+  },
+  "scripts": {
+    "test": "test",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.engr.illinois.edu:bershan2/cookie-policy.git"
+  },
+  "author": "Anton Bershanskiy",
+  "license": "ISC"
+}

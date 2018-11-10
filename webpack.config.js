@@ -38,8 +38,10 @@ for (const src of copy)
 
 // Add all files that do require processing to webpack work order
 var entries = {}
-for (const file of files)
+for (const file of files){
 	entries[file] = base + file
+	console.log("Added for packaging " + file)
+}
 
 // Ask webpack to process these files
 module.exports = {

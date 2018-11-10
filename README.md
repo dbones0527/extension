@@ -93,6 +93,13 @@ takes the following precautions:
 
 The extension relies on `npm` modules and `webpack` for building.
 
+To get started, follow these steps:
+1. Download official [Node.js](https://nodejs.org/) installer and install it
+2. Clone this repo somewhere and `cd` into that folder
+3. Install all dependencies with `npm i`
+4. Build the extension with `npm run build`
+5. Make changes to files in `source/` and repeat step 4 to rebuild the extension
+
 ## Dependencies
 
 This extesion uses the following `npm` modules: *TODO: WRITE WHICH ONES*

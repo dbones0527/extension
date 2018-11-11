@@ -1,9 +1,61 @@
 "use strict"
 
+// TODO: Move to platform
+// List of pages on which extension is forbidden for security considerations.
+const restrictedPrefixes = {
+	"about:": "Firefox internal page.",
+	"https://addons.mozilla.org/": "Mozilla extension store (AMO) page.",
+	"https://testpilot.firefox.com/": "Firefox Test Pilot page."
+}
+
 const platform = chrome
 
-// Notify other pages (background) that popup is open
-platform.runtime.sendMessage({popupOpen: true, popupSection: "general"})
+var tabId = null
+
+platform.tabs.query({active: true, currentWindow: true }, function(activeTabs){
+	tabId = activeTabs[0].id
+	console.log(activeTabs)
+
+	pageNothingToDo(activeTabs)
+
+	// Notify other pages (background) that popup is open
+	platform.runtime.sendMessage({popupOpen: true, popupSection: "general", tabId: tabId})
+})
+
+/* Messaging
+// Firefox:
+//		platform.runtime.sendMessage(message).then(handleResponse, handleError)
+// Chrome:
+//		platform.runtime.sendMessage(message, handleResponse)
+
+// Handle message error
+function handleError(error) {
+	console.log("Error:", error)
+}
+*/
+
+function pageNothingToDo(activeTabs){
+
+	// Check the current page against all restricted pages
+	var url = activeTabs[0].url
+	for (const prefix in restrictedPrefixes)
+		// this is equivalent to startsWith()
+		if (url.substring(0,prefix.length) === prefix){
+			// Match found, so we remove all regular content and display explanation
+			const text = "This is a safe " + restrictedPrefixes[prefix] + "\nThe page is: " + url
+			// Remove all content
+			document.body.removeChild(document.getElementById("content"))
+			// Show explanation and message
+			var message = document.createElement("P")
+			message.innerText = text
+			document.body.appendChild(message)
+			return true
+		}
+
+	// If page does not match any of the restricted page prefixes, remove message
+	document.body.removeChild(document.getElementById("message"))
+	return false
+}
 
 /*
 TODO: uncomment and figure out source of warnings
@@ -122,28 +174,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
 				// PREPARE THE NEWLY SELECTED SECTION TAB
 				// TODO: live update of all information
-				platform.tabs.query({active: true, currentWindow: true }, function(activeTabs){
-					const tabId = activeTabs[0].id
-					console.log(activeTabs)
-					const message = {popupOpen: true, popupSection: selectionNew, tabId: tabId}
+				// TODO: take care of data race with tabId
+				const message = {popupOpen: true, popupSection: selectionNew, tabId: tabId}
 
-					function handleError(error) {
-						console.log("Error:", error)
-					}
+				switch(selectionNew){
+					case "security":
+						platform.runtime.sendMessage(message, displaySectionSecurity)
+						break
+					default:
+						console.log("Error: section handler missing")
+				}
 
-					// Firefox:
-					//		platform.runtime.sendMessage(message).then(displayCookies, handleError)
 
-					// Chrome:
-					switch(selectionNew){
-						case "security":
-							platform.runtime.sendMessage(message, displaySectionSecurity)
-							break
-						default:
-							console.log("Error")
-					}
-
-				})
 
 				// SWITCH TO THE NEWLY SELECTED SECTION TAB
 				// If some section was previously selected, unselect its button and hide details

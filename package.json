@@ -13,7 +13,9 @@
   },
   "scripts": {
     "test": "test",
-    "build": "webpack"
+    "build": "webpack",
+    "clean": "rm -rf build;",
+    "icons": "curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/question-circle-o.svg -o source/common/includes/fontawesome/question-circle-o.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/caret-down.svg -o source/common/includes/fontawesome/caret-down.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/caret-right.svg -o source/common/includes/fontawesome/caret-right.svg"
   },
   "repository": {
     "type": "git",

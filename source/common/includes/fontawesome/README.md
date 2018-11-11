@@ -1,4 +1,5 @@
-The icons in this folder were provided by 
+The icons in this folder were originally developed by 
 [*Font Awesome*](https://fontawesome.com/) 
-licensed under the Creative Commons Attribution 4.0 International license.
-See details [here](https://fontawesome.com/license).
+and licensed under the Creative Commons Attribution 4.0 International license,
+see details [here](https://fontawesome.com/license). The actual files are 
+downloaded from [Font-Awesome-SVG-PNG](https://github.com/encharm/Font-Awesome-SVG-PNG).

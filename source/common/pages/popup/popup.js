@@ -77,26 +77,42 @@ function debugMessage(message){
 }
 
 /*
+ * Edit label of list entry
+ */
+function editLabel(evt) {
+	var elem = evt.target
+	// Ignore clicks outside of button
+	if (elem.nodeName === "BUTTON"){
+		var editable = elem.parentNode.getElementsByTagName("A")[0]
+		editable.contentEditable="true"
+		editable.focus()
+	}
+}
+
+// Collapsible lists can be done with <details> and <summary>,
+// but browser support is limited
+function collapsibleList(evt){
+	var target = evt.target
+	// if clicked on the label A, go level up to the LI
+	if (target.nodeName === "A")
+		target = target.parentNode
+	console.log(target)
+	if (target.nodeName === "LI"){
+		console.log("Stuff")
+		target.classList.toggle("list-collapsible--active")
+	}
+}
+
+
+/*
  * Create nested list with editable labels (optional)
  */
 function nestedList(information, editable){
-	/*
-	 * Edit label of list entry
-	 */
-	function editLabel(evt) {
-		var elem = evt.target
-		// Ignore clicks outside of button
-		if (elem.nodeName === "BUTTON"){
-			var editable = elem.parentNode.getElementsByTagName("A")[0]
-			editable.contentEditable="true"
-			editable.focus()
-		}
-	}
+
 
 	// make sure object is well-formed
-	if (information === null || information === undefined) {
+	if (information === null || information === undefined)
 		return false
-	}
 
 	if (typeof information === "string" || typeof information === "number"){
 		var elem = document.createElement("LI")
@@ -108,9 +124,6 @@ function nestedList(information, editable){
 
 	// Create list
 	var list = document.createElement("UL")
-	// Add edit event handler
-	if (editable !== false)
-		list.addEventListener("click", editLabel)
 
 	// Create LI element with specified label and, optionally, edit button
 	function createElement(label_text, editable){
@@ -151,6 +164,7 @@ function nestedList(information, editable){
 document.addEventListener("DOMContentLoaded", function() {
 	function displaySectionPrimary(information) {}
 	function displaySectionThirdparty(information) {}
+	// TODO: Do not re-create the list from scratch every time
 	function displaySectionSecurity(information) {
 		console.log("Inforinformation", information)
 		const list = document.getElementById("details-" + "security" + "-list")
@@ -158,7 +172,12 @@ document.addEventListener("DOMContentLoaded", function() {
 		// TODO: avoid complete list re-creation,
 		// since it looses information about open and closed sublists
 		const listNew = nestedList(information.observations)
+		listNew.classList.add("list-collapsible")
+		listNew.addEventListener("click", editLabel)
+		listNew.addEventListener("click", collapsibleList)
+
 		list.replaceWith(listNew)
+		listNew.id = "details-" + "security" + "-list"
 		console.log("background script sent a response:", information)
 	}
 	function displaySectionDebugging(information) {}

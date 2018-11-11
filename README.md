@@ -97,8 +97,10 @@ To get started, follow these steps:
 1. Download official [Node.js](https://nodejs.org/) installer and install it
 2. Clone this repo somewhere and `cd` into that folder
 3. Install all dependencies with `npm i`
-4. Build the extension with `npm run build`
-5. Make changes to files in `source/` and repeat step 4 to rebuild the extension
+4. Download [Font Awesome](https://fontawesome.com/) icons with `npm run icons`
+5. Now you can build and rebuild the extension with `npm run build`
+
+Just edit files in `source/common` and rebuild the extension (step 5) and test it.
 
 ## Dependencies
 

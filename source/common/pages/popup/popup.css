@@ -1,14 +1,23 @@
+/* Remove all margins to make window properly fit the contents */
 body {
 	margin: 0;
 	padding: 0;
 	font-family: sans-serif;
 }
 
+h1, h2, h3, p {
+	margin: 0;
+	padding: 5px;
+	padding-top: 10px;
+}
+
+/* Size of the window on non-restricted pages */
 #content {
 	height: 600px;
 	width: 600px;
 }
 
+/* Style of the main menu */
 #main-menu {
 	width: 50%;
 	height: 100%;
@@ -16,6 +25,7 @@ body {
 	background-color: #eeeeee;
 }
 
+/* Style of the Details section */
 #details {
 	width: 50%;
 	height: 100%;
@@ -42,6 +52,7 @@ body {
 	height: 30%;
 }
 
+/* The style modifier for selecter main menu item */
 .main-menu-item--active {
 	background-color: #ffcc66;
 	transition: background-color 0.5s;
@@ -53,17 +64,12 @@ body {
 	padding-top: 10px;
 }
 
-h1, h2, h3, p {
-	margin: 0;
-	padding: 5px;
-	padding-top: 10px;
-}
-
-
+/* Unselected details section is hidden */
 .details-item {
 	display: none;
 }
 
+/* Style of the selected details section */
 .details-item--active {
 	display: block;
 	height: 100%;
@@ -73,7 +79,52 @@ h1, h2, h3, p {
 	overflow: auto;
 }
 
+/* The "informaton" button in the main menu */
 .info{
 	width: 1em;
 	float: right;
+}
+
+/*
+ * COLLAPSIBLE LISTS
+ */
+
+.list-collapsible {
+	list-style: none;
+	padding-inline-start: 1em;
+}
+
+.list-collapsible > li > ul{
+	display:none
+}
+
+.list-collapsible--active > ul {
+	display:block !important
+}
+
+/*
+ * The look of the drop-down indicator
+ * on the left of collapsible list item
+ * in CLOSED position
+ */
+.list-collapsible > li::before {
+	background-image: url("/includes/fontawesome/caret-right.svg");
+	background-size: 20px;
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	content:"";
+}
+
+/* The look of the drop-down indicator
+ * on the left of collapsible list item
+ * in OPEN position
+ */
+.list-collapsible > li.list-collapsible--active::before {
+	background-image: url("/includes/fontawesome/caret-down.svg");
+	background-size: 20px;
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	content:"";
 }

@@ -23,6 +23,7 @@ h1, h2, h3, p {
 	height: 100%;
 	float: left;
 	background-color: #eeeeee;
+	cursor: pointer;
 }
 
 /* Style of the Details section */
@@ -83,6 +84,7 @@ h1, h2, h3, p {
 .info{
 	width: 1em;
 	float: right;
+	cursor: help;
 }
 
 /*
@@ -120,11 +122,39 @@ h1, h2, h3, p {
  * on the left of collapsible list item
  * in OPEN position
  */
-.list-collapsible > li.list-collapsible--active::before {
+ul.list-collapsible > li.list-collapsible--active::before {
 	background-image: url("/includes/fontawesome/caret-down.svg");
 	background-size: 20px;
 	display: inline-block;
 	width: 20px;
 	height: 20px;
 	content:"";
+}
+
+/* The icon to the right of the domain name in the list
+ * Can be one of "secure", "enabled", "disabled", "insecure"
+ */
+
+li.list-domain > a::after {
+	background-size: 20px;
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	content:"";
+}
+
+li.list-domain--secure > a::after {
+	background-image: url("/includes/fontawesome/check.svg");
+}
+
+li.list-domain--enabled > a::after {
+	background-image: url("/includes/fontawesome/lock.svg");
+}
+
+li.list-domain--disabled > a::after {
+	background-image: url("/includes/fontawesome/unlock.svg");
+}
+
+li.list-domain--insecure > a::after {
+	background-image: url("/includes/fontawesome/exclamation-triangle.svg");
 }

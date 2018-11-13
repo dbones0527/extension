@@ -2,6 +2,7 @@
 
 // TODO: Move to platform
 // List of pages on which extension is forbidden for security considerations.
+// key is the URL prefix and value is the message to the user.
 const restrictedPrefixes = {
 	"about:": "Firefox internal page.",
 	"https://addons.mozilla.org/": "Mozilla extension store (AMO) page.",
@@ -11,12 +12,14 @@ const restrictedPrefixes = {
 const platform = chrome
 
 var tabId = null
+var firstPartyDomain = null
 
 platform.tabs.query({active: true, currentWindow: true }, function(activeTabs){
 	tabId = activeTabs[0].id
+	firstPartyDomain = (new URL(activeTabs[0].url)).hostname
 	console.log(activeTabs)
 
-	pageNothingToDo(activeTabs)
+	pageNothingToDo(activeTabs[0].url)
 
 	// Notify other pages (background) that popup is open
 	platform.runtime.sendMessage({popupOpen: true, popupSection: "general", tabId: tabId})
@@ -34,10 +37,9 @@ function handleError(error) {
 }
 */
 
-function pageNothingToDo(activeTabs){
+function pageNothingToDo(url){
 
 	// Check the current page against all restricted pages
-	var url = activeTabs[0].url
 	for (const prefix in restrictedPrefixes)
 		// this is equivalent to startsWith()
 		if (url.substring(0,prefix.length) === prefix){
@@ -89,8 +91,14 @@ function editLabel(evt) {
 	}
 }
 
-// Collapsible lists can be done with <details> and <summary>,
-// but browser support is limited
+/*
+ * Handle click on collapsable list label:
+ * show/hide details and change list label decoration
+ * Collapsible lists can be done with <details> and <summary>,
+ * but: 1. browser support is limited
+ *      2. still need JS toggle expanded/collapsed list decodation
+ *         to the left of the label, aka arrow icons > or V
+ */
 function collapsibleList(evt){
 	var target = evt.target
 	// if clicked on the label A, go level up to the LI
@@ -103,10 +111,52 @@ function collapsibleList(evt){
 	}
 }
 
+/*
+ *
+ */
+function securityList(information, editable){
+	function createElement(label_text, editable){
+		var elem = document.createElement("LI")
+		var label = document.createElement("A")
+		label.innerText = label_text
+		elem.appendChild(label)
+
+		// If element label is editable, create button for editing it
+		if (editable !== false){
+			var btn = document.createElement("BUTTON")
+			btn.innerText = "edit"
+			elem.appendChild(btn)
+		}
+		return elem
+	}
+	// Create list
+	var list = document.createElement("UL")
+	for (const domain in information){
+		// Create the list element with its details
+		var elem = createElement(domain, editable)
+		// Assign the right CSS class to display security status icon
+		const cssSecurityClass = "list-domain--" + information[domain].status
+		elem.classList.add(cssSecurityClass)
+		elem.classList.add("list-domain")
+		list.appendChild(elem)
+
+		// Create sublist of cookies
+		var cookie_list = document.createElement("UL")
+		elem.appendChild(cookie_list)
+
+		// Display sublist of cookies
+		// TODO: IMPLEMENT
+		// TODO: Display cookies for higher domains?
+		var entry = createElement("TODO: display cookies", editable)
+		cookie_list.appendChild(entry)
+	}
+	return list
+}
 
 /*
  * Create nested list with editable labels (optional)
  */
+/*
 function nestedList(information, editable){
 
 
@@ -129,13 +179,14 @@ function nestedList(information, editable){
 	function createElement(label_text, editable){
 		var elem = document.createElement("LI")
 		var label = document.createElement("A")
-		label.innerText = label_text
+		label.innerText = JSON.stringify(label_text)
 		elem.appendChild(label)
 		// If element label is editable, create button for editing it
 		if (editable !== false){
 			var btn = document.createElement("BUTTON")
 			btn.innerText = "edit"
 			elem.appendChild(btn)
+			elem.classList.add("list-secure")
 		}
 		return elem
 	}
@@ -160,6 +211,7 @@ function nestedList(information, editable){
 	}
 	return list
 }
+*/
 
 document.addEventListener("DOMContentLoaded", function() {
 	function displaySectionPrimary(information) {}
@@ -171,14 +223,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		// TODO: avoid complete list re-creation,
 		// since it looses information about open and closed sublists
-		const listNew = nestedList(information.observations)
+		const listNew = securityList(information.domains)
 		listNew.classList.add("list-collapsible")
 		listNew.addEventListener("click", editLabel)
 		listNew.addEventListener("click", collapsibleList)
 
 		list.replaceWith(listNew)
 		listNew.id = "details-" + "security" + "-list"
-		console.log("background script sent a response:", information)
 	}
 	function displaySectionDebugging(information) {}
 

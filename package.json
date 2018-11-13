@@ -13,9 +13,10 @@
   },
   "scripts": {
     "test": "test",
-    "build": "webpack",
+    "build": "webpack --mode=production",
+    "dev": "webpack --mode=development",
     "clean": "rm -rf build;",
-    "icons": "curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/question-circle-o.svg -o source/common/includes/fontawesome/question-circle-o.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/caret-down.svg -o source/common/includes/fontawesome/caret-down.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/caret-right.svg -o source/common/includes/fontawesome/caret-right.svg"
+    "icons": "curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/question-circle-o.svg -o source/common/includes/fontawesome/question-circle-o.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/caret-down.svg -o source/common/includes/fontawesome/caret-down.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/caret-right.svg -o source/common/includes/fontawesome/caret-right.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/check.svg -o source/common/includes/fontawesome/check.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/lock.svg -o source/common/includes/fontawesome/lock.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/unlock.svg -o source/common/includes/fontawesome/unlock.svg && curl https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/svg/exclamation-triangle.svg -o source/common/includes/fontawesome/exclamation-triangle.svg"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-const parseResponseHeaderStrictTransportSecurity = require("./hsts").parseResponseHeaderStrictTransportSecurity
+const hsts = require("./hsts")
 
 // TODO: Actual test infrastructure
 
@@ -30,6 +30,6 @@ const testParseResponseHeaderStrictTransportSecurity = [
 ]
 
 for (const testcase of testParseResponseHeaderStrictTransportSecurity){
-	console.log (parseResponseHeaderStrictTransportSecurity(testcase.input))
+	console.log (hsts.parseHSTSHeader(testcase.input))
 	console.log (testcase.answer)
 }

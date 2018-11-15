@@ -1,4 +1,4 @@
-/*
+/**
  * Determine if resource is a third-party based only on domain names
  * @param   origin - string, domain of the orgin page or frame
  * @param   resource - string, domain of the resource

@@ -4,7 +4,7 @@ const platform = require("../libraries/platform").platform
 
 const cookie = require("cookie")
 
-const parseResponseHeaderStrictTransportSecurity = require("../libraries/hsts/hsts").parseResponseHeaderStrictTransportSecurity
+const hsts = require("../libraries/hsts/hsts")
 
 const thirdparty = require("../libraries/thirdparty/thirdparty").thirdparty
 
@@ -15,31 +15,28 @@ const urlPopup = window.location.origin + "/pages/popup/popup.html"
 // TODO: make an actual datasructure.
 var cookieDatabase = {"example":"example"}
 
-/* Structure of tabObservations is as follows:
-	tabObservations is a dictionaty with keys tabId and values objects
-		originUrl (string) - sanity check that page is correct
-		domains - a dictionary with keys domains and values objects
-			thirdparty (boolean) - if this should be displayed on "Primary resources" or "Third-party resources"
-				this is assigned when record is created
-			status (string)
-				this is assigned/updated when record is requested by UI
-				status has one of the following values:
-					"secure"   -- domain is already protected, e.g. by HSTS or CSP
-					"enabled"  -- we protect vulnerable domain
-					"disabled" -- we let vulnerable domain be vulnerable
-					"insecure" -- domain does not support HTTPS (hopeless case)
-				// reason - string explanation, to be put on tooltip CSP HSTS
-			cookies - dictionary of cookies with key cookie name and value object
-				(it is summary to be displayed in the popup)
-			events - all things that ever happened
-*/
+/**
+ * Structure of tabObservations is as follows:
+ * tabObservations is a dictionaty with keys tabId and values objects
+ *     originUrl {string} - sanity check that page is correct
+ *     domains - a dictionary with keys domains and values objects
+ *         thirdparty {boolean} - if this should be displayed on "Primary resources" or "Third-party resources"
+ *             this is assigned when record is created
+ *         status (string)
+ *             this is assigned/updated when record is requested by UI
+ *             status has one of the following values:
+ *             	   "secure"   -- domain is already protected, e.g. by HSTS or CSP
+ *             	   "enabled"  -- we protect vulnerable domain
+ *                 "disabled" -- we let vulnerable domain be vulnerable
+ *                 "insecure" -- domain does not support HTTPS (hopeless case)
+ *             // reason - string explanation, to be put on tooltip CSP HSTS
+ *             (it is summary to be displayed in the popup)
+ *     events - all things that ever happened
+ *         usefull for debugging, but very memory-heavy
+ */
 var tabObservations = {}
 
-// Disctionary with keys domains and values the current HSTS record
-// TODO: remember time of record creation
-var hstsObservations = {}
-
-/*
+/**
  * Prepare datastructures of the newly installed extension
  */
 platform.runtime.onInstalled.addListener (function() {
@@ -75,7 +72,6 @@ platform.runtime.onInstalled.addListener (function() {
 							console.log("Popup open: Security, preparing report")
 							let report = tabObservations[message.tabId]
 							console.log("REPORT BEFORE", report)
-							console.log(hstsObservations)
 							for (const domain in report.domains){
 								// Update domain status
 								switch(report.domains[domain].status){
@@ -85,29 +81,12 @@ platform.runtime.onInstalled.addListener (function() {
 									case null:
 										// Need to update security assessment
 										// TODO: which check CSP and differentiate between "disabled" and "insecure"
-										// REFACTOR: Move to "library"?
 										var status = null
 
-										// Check HSTS
-										const subDomains = domain.split(".")
-										const numSubDomains = subDomains.length
-										var currSubDomain = ""
-										for (var i=1; i<=numSubDomains; i++){
-											// Update subdomain
-											currSubDomain = subDomains[numSubDomains-i] + currSubDomain
-											// Check against the HSTS records
-											if (hstsObservations[currSubDomain] !== undefined && hstsObservations[currSubDomain].content.maxAge > 0){
-												// TODO: take into account time of record creation
-												// TODO: take into account consistency
-												// TODO: take into account includeSubdomains directve if currSubDomain !== domain
-												// TODO: take into account preload list
-												status = "secure"
-											}
-											console.log(domain, subDomains, currSubDomain, hstsObservations[currSubDomain])
-											// Prepare for the next iteration
-											currSubDomain = "." + currSubDomain
-										}
-										// Check CSP
+										// Check HSTS status
+										status = hsts.queryStatus(domain)
+
+										// Check CSP status
 										// TODO!
 										report.domains[domain].status = status
 										break
@@ -138,14 +117,16 @@ platform.runtime.onInstalled.addListener (function() {
 	})
 })
 
-/*
+/**
  * Observe the network activity around coookies
  */
 function onPermissionWebRequestGranted(){
 	const urls = ["http://*/*", "https://*/*"]
 
-	/*
+	/**
 	 * Remembers observations about tabs (pages)
+	 * @param request {Object} - request details obtained from API
+	 * @param observationa {Object} - array of observation objects
 	 * TODO: make this into a Promise
 	 * TODO: avoid passing `request` (pick out only the necessary parts in caller)
 	 */
@@ -170,21 +151,7 @@ function onPermissionWebRequestGranted(){
 		for (var observation of observations){
 			switch (observation.type){
 				case "HSTS":
-					// TODO: Is consistency critera good?
-					if (hstsObservations[resourceDomain] === undefined){
-						// this is first HSTS header encountered
-						hstsObservations[resourceDomain] = {
-							consistent: true,
-							content: observation.content,
-							createdTime: null // TODO: remember time
-						}
-					} else {
-						// this domain already has HSTS policy
-						if (hstsObservations[resourceDomain] && hstsObservations[resourceDomain].maxAge !== observation.content)
-							hstsObservations[resourceDomain].consistent = false
-						hstsObservations[resourceDomain].content = observation.content
-						hstsObservations[resourceDomain].createdTime = null // TODO: remember time
-					}
+					hsts.record(resourceDomain, observation.content)
 					break
 				case "CSP":
 					break
@@ -194,11 +161,12 @@ function onPermissionWebRequestGranted(){
 		}
 	}
 
-	/*
+	/**
 	 * Observe the Cookie header containing cookies being sent to the server
+	 * @param   details {Object} - the details of request obtained from API
+	 * @returns {Object} the redacted headers
 	 */
 	function watchCookiesSent(details){
-//		console.log("Request")
 		var observations = []
 
 		const protocol = new URL(details.url).protocol
@@ -219,27 +187,29 @@ function onPermissionWebRequestGranted(){
 		}
 
 		rememberTabObservation(details, observations)
-//		console.log("Request processed")
 		return {requestHeaders: details.requestHeaders}
 	}
 
-	/*
+	/**
 	 * Observe the Set-Cookie header in response from the server
+	 * @param   details {Object} - the details of request obtained from API
+	 * @returns {Object} the redacted headers
 	 */
 	// TODO: Difference between "set-cookie" and "Set-Cookie"
 	// TODO: support protocols other than HTTP(S)
 	function watchResponse(details){
-
-//		console.log("Response")
 		var observations = []
 
 		// Get additional parameters
 		const url = new URL(details.url).protocol
+		// Look through all headers one at a time
 		for (var i = 0; i < details.responseHeaders.length; ++i) {
 			const headerName = details.responseHeaders[i].name.toLowerCase()
 			const headerValue = details.responseHeaders[i].value
 			switch (headerName){
 				case "set-cookie":
+					// TODO: Record cookie details
+					// TODO: Block cookie, if user opted for the corresponding setting
 					const name = headerValue.substring(0, headerValue.indexOf("="))
 					observations.push({type: "Cookie", content: "Cookie set: "+name})
 					cookieDatabase[name] = {secureOrigin: url.protocol === "https:", httpOnly: true}
@@ -248,8 +218,7 @@ function onPermissionWebRequestGranted(){
 				case "strict-transport-security":
 					// Remember HSTS header for later reference in the popup
 					// Parsing library options: did not find any, had to write my own
-					var hstsAttributes = parseResponseHeaderStrictTransportSecurity(headerValue)
-					observations.push({type: "HSTS", content: hstsAttributes})
+					observations.push({type: "HSTS", content: headerValue})
 					break
 
 				case "content-security-policy":
@@ -279,15 +248,15 @@ function onPermissionWebRequestGranted(){
 					break
 				default:
 					// Header not interesting
+					// TODO: See what falls here?
 			}
 		}
 		rememberTabObservation(details, observations)
-//		console.log ("Observations", details, observations)
-//		console.log("Response processed")
 		return {responseHeaders: details.responseHeaders}
 	}
 
 	function logError(details){
+		// TODO: Is this informative in any way?
 		console.log("Network error, e.g. other extension blocked")
 	}
 

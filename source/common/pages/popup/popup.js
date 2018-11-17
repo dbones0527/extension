@@ -17,7 +17,6 @@ var firstPartyDomain = null
 platform.tabs.query({active: true, currentWindow: true }, function(activeTabs){
 	tabId = activeTabs[0].id
 	firstPartyDomain = (new URL(activeTabs[0].url)).hostname
-	console.log(activeTabs)
 
 	pageNothingToDo(activeTabs[0].url)
 
@@ -217,8 +216,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	function displaySectionPrimary(information) {}
 	function displaySectionThirdparty(information) {}
 	// TODO: Do not re-create the list from scratch every time
-	function displaySectionSecurity(information) {
-		console.log("Inforinformation", information)
+	function displaySectionSecurity(information){
+		// No information to display
+		// TODO: display a friendly message
+		if (!information){
+			console.log("No information to display")
+			return
+		}
+
+		console.log("Information: ", information)
 		const list = document.getElementById("details-" + "security" + "-list")
 
 		// TODO: avoid complete list re-creation,

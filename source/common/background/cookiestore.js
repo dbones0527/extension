@@ -62,16 +62,15 @@ platform.runtime.onInstalled.addListener (function() {
 		switch (sender.url){
 			case urlPopup:
 				if(message.popupOpen === true) {
-					console.log(message)
 					switch(message.popupSection){
 						case "general":
-							console.log("Popup open: General")
 							break
 						// Prepare security report
 						case "security":
-							console.log("Popup open: Security, preparing report")
 							let report = tabObservations[message.tabId]
-							console.log("REPORT BEFORE", report)
+							// No data about the tab, likely because extension was loaded after the tab.
+							if (report === undefined)
+								return
 							for (const domain in report.domains){
 								// Update domain status
 								switch(report.domains[domain].status){
@@ -100,11 +99,10 @@ platform.runtime.onInstalled.addListener (function() {
 										break
 								}
 							}
-							console.log("Popup open: Security, sending report", report)
 							sendResponse(report)
 							break
 						default:
-							console.log("Error")
+							console.log("ERROR: Unknown section", message.popupSection)
 					}
 				}
 				if(message.popupOpen === false) {
@@ -131,19 +129,29 @@ function onPermissionWebRequestGranted(){
 	 * TODO: avoid passing `request` (pick out only the necessary parts in caller)
 	 */
 	function rememberTabObservation(request, observations){
-		const tabId = request.tabId, originUrl = request.originUrl, resource = request.url, parentFrameId = request.parentFrameId
+		const tabId = request.tabId, resource = request.url, parentFrameId = request.parentFrameId
+		// Chrome API has request.initiator if this is not the main frame (e.g., when parentFrameId!= -1), Firefox has request.originUrl
+		const originUrl = request.originUrl || request.initiator
 		// if no record exists, create one; if record is tied to different origin, assume it is a different page
 		// TODO: is the above assumption correct for, e.g., SPA?
 		const newPage = false// parentFrameId !== -1 && tabObservations[tabId].originUrl !== originUrl
 		if (tabObservations[tabId] === undefined || newPage)
 			tabObservations[tabId] = {originUrl: originUrl, domains:{}}
 
-		var resourceDomain = new URL(resource).hostname
+		const resourceDomain = (new URL(resource)).hostname
 		if (tabObservations[tabId].domains[resourceDomain] === undefined){
 			// Determine whether domain is third-party
 			// TODO: find library or improve own implementation
-			const originDomain = new URL(originUrl).hostname
-			const thirdparty_ = thirdparty(originDomain, resourceDomain)
+			var thirdparty_ = null
+			// In Chrome, the new search tab has tabId === -1
+			// Not considered thirdparty
+			if (request.type === "main_frame" || tabId === -1){
+				// This is the main frame, deffinitely not thirdparty
+				thirdparty_ = false
+			} else {
+				const originDomain = (new URL(originUrl)).hostname
+				thirdparty_ = thirdparty(originDomain, resourceDomain)
+			}
 
 			tabObservations[tabId].domains[resourceDomain] = {thirdparty: thirdparty_, status: null, events: []}
 		}
@@ -169,7 +177,7 @@ function onPermissionWebRequestGranted(){
 	function watchCookiesSent(details){
 		var observations = []
 
-		const protocol = new URL(details.url).protocol
+		const protocol = (new URL(details.url)).protocol
 		for (var i = 0; i < details.requestHeaders.length; ++i) {
 			if (details.requestHeaders[i].name === "Cookie") {
 				const parsed = cookie.parse(details.requestHeaders[i].value)
@@ -201,7 +209,7 @@ function onPermissionWebRequestGranted(){
 		var observations = []
 
 		// Get additional parameters
-		const url = new URL(details.url).protocol
+		const url = (new URL(details.url)).protocol
 		// Look through all headers one at a time
 		for (var i = 0; i < details.responseHeaders.length; ++i) {
 			const headerName = details.responseHeaders[i].name.toLowerCase()

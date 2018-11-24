@@ -1,9 +1,11 @@
 <!doctype html>
 <html>
   <head>
-    <title></title>
+    <title>Popup</title>
     <meta charset="utf-8"/>
+    <link href="/includes/materialize-css/materialize.css" rel="stylesheet"/>
     <link href="popup.css" rel="stylesheet"/>
+    <script src="/includes/materialize-css/materialize.js" defer></script>
     <script src="popup.js" defer></script>
   </head>
   <body>
@@ -14,58 +16,78 @@
 
     <div id="content">
       <div id="main-menu">
+        <!-- First-party section below -->
         <div id="main-menu-primary" class="main-menu-item main-menu-item-large">
-          <h2>Primary resources<img alt="?" class="info" src="/includes/fontawesome/question-circle-o.svg"></h2>
+          <div class="main-menu-section">
+            <img alt="Image goes here" src="/includes/fontawesome/question-circle-o.svg"/>
+            <div>
+              <h6>First-party resources<img alt="?" class="info" src="/includes/fontawesome/question-circle-o.svg"></h6>
+              <p>First-party resources are provided by the site owners.</p>
+            </div>
+          </div>
         </div>
+        <!-- Third-party section below -->
         <div id="main-menu-thirdparty" class="main-menu-item main-menu-item-large">
-          <h2>Third-party sources<img alt="?" class="info" src="/includes/fontawesome/question-circle-o.svg"></h2>
+          <div class="main-menu-section">
+            <img alt="Image goes here" src="/includes/fontawesome/question-circle-o.svg"/>
+            <div>
+              <h6>Third-party resources<img alt="?" class="info" src="/includes/fontawesome/question-circle-o.svg"></h6>
+              <p>First-party resources are provided by the site owners.</p>
+              <p>Sites blocked: None.</p>
+            </div>
+          </div>
         </div>
+        <!-- Security section below -->
         <div id="main-menu-security" class="main-menu-item main-menu-item-large">
-          <h2>Security<img alt="?" class="info" src="/includes/fontawesome/question-circle-o.svg"></h2>
+          <div class="main-menu-section">
+            <img alt="Image goes here" src="/includes/fontawesome/question-circle-o.svg"/>
+            <div>
+              <h6>Security<img alt="?" class="info" src="/includes/fontawesome/question-circle-o.svg"></h6>
+              <p>Protecting all informaton.</p>
+            </div>
+          </div>
         </div>
+        <!-- Debugging section below -->
         <div id="main-menu-debug" class="main-menu-item main-menu-item-small">
-          <h2>Something broke?<img alt="?" class="info" src="/includes/fontawesome/question-circle-o.svg"></h2>
+          <h6>Something broke?<img alt="?" class="info" src="/includes/fontawesome/question-circle-o.svg"></h6>
         </div>
       </div>
       <div id="details">
         <div id="details-default" class="details-item">
-          <h2>You didn't choose anything yet</h2>
+          <h6>You didn't choose anything yet</h6>
         </div>
         <div id="details-primary" class="details-item">
-          <h2>You chose Primary</h2>
+          <h6>You chose Primary</h6>
         </div>
         <div id="details-thirdparty" class="details-item">
-          <h2>You chose Thirdparty</h2>
+          <h6>You chose Thirdparty</h6>
         </div>
         <div id="details-security" class="details-item">
-          <h2>You chose Security</h2>
-          <div>
-            <select name="site">
-              <option value="" disabled selected hidden>Site</option>
-              <option value="any">Any</option>
-            </select>
-            <select name="security">
-              <option value="" disabled selected hidden>Security</option>
-              <option value="any">Any</option>
-              <option value="safe">Secure by default</option>
-              <option value="enabled">Under protection</option>
-              <option value="disabled">Vulnerable</option>
-              <option value="insecure">Insecure</option>
-            </select>
-            <select name="severity">
-              <option value="" disabled selected hidden>Severity</option>
-              <option value="any">Any</option>
-              <option value="">Tempering possible</option>
-              <option value="volvo">Tempering detected</option>
-              <option value="confideniality">Snooping possible</option>
-              <option value="leak">Leak detected</option>
-            </select>
+          <h6>You chose Security</h6>
+          <!-- This is Autocomplete -->
+          <!--
+          <div class="row">
+            <div class="col s12">
+              <div class="row">
+                <div class="input-field col s12">
+                  <!-- TODO: Add icon
+                  <i class="material-icons prefix">textsms</i>
+                  ->
+                  <input type="text" id="search-security" class="autocomplete">
+                  <label for="search-security">Security considerations</label>
+                </div>
+              </div>
+            </div>
           </div>
+          -->
+          <!-- This is Chips with Autocomplete -->
+          <div id="search-security-chips"></div>
+          <p>Available selectors include: "domain:[domain]", "security:[secure|protected|vulnerable|insecure]", "thirdparty:[yes|no]" and "threat:[TODO]".</p>
           <p>Enabling some of these options may break the site functionality. In that case, you might have to revert back.</p>
           <ul id="details-security-list" class="list-collapsible"></ul>
         </div>
         <div id="details-debug" class="details-item">
-          <h2>You chose Debugging</h2>
+          <h6>You chose Debugging</h6>
         </div>
       </div>
     </div>

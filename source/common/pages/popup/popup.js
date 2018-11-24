@@ -137,6 +137,7 @@ function securityList(information, editable){
 		const cssSecurityClass = "list-domain--" + information[domain].status
 		elem.classList.add(cssSecurityClass)
 		elem.classList.add("list-domain")
+		elem.domain = domain
 		list.appendChild(elem)
 
 		// Create sublist of cookies
@@ -212,14 +213,112 @@ function nestedList(information, editable){
 }
 */
 
+/*
+ * Prepare list of domains for search
+ * @param {Object} possibilities - a dictionary of possible tags with
+ *                 keys tag types and values possible tag values
+ * @returns {Object} dictionary of with keys chip tag name and value chip icon URL
+ * Example: for {"thirdparty":["yes", "no"]} it will return {"thirdparty:yes":null, "thirdparty:no":null}
+ */
+function searchTags(possibilities){
+	var tags = {}
+	for (const tagType in possibilities){
+		console.log(tags, tagType, possibilities[tagType])
+		for (const tagValue of possibilities[tagType]){
+			const tag = tagType + ":" + tagValue
+			tags[tag] = null
+		}
+	}
+	console.log(tags)
+	return tags
+}
+
+function searchDataDomains (information){
+	var data = {}
+	for (const domain in information.domains){
+		const key = "domain:" + domain
+		data[key] = null
+	}
+	return data
+}
+
+function searchDataSecurity(){
+	return {
+		"security:secure":null,
+		"security:protected":null,
+		"security:vulnerable":null,
+		"security:insecure":null
+	}
+}
+
+function searchDataThirdparty(){
+	return {
+		"thirdparty:yes":null,
+		"thirdparty:no":null
+	}
+}
+
+/*
+ * Update the list
+ */
+function searchResultUpdate(objects, htmlElement, action, information){
+	console.log("UPDATEEEEE", action, objects, htmlElement)
+	const chipsData = objects[0].M_Chips.chipsData
+	console.log(chipsData)
+
+	/* Transform chipsData to filter rules */
+	// The prefoxes signifying tag types
+	const tagTypes = ["domain", "security", "thirdparty"]
+	// The representation of the ruleset as an object
+	var filters = {}
+	// Initialize ruleset with empty tags
+	for (const tagType of tagTypes)
+		filters[tagType] = []
+	// Parse each chip and add the tags to the ruleset
+	for (const chipData of chipsData){
+		const tag = chipData.tag
+		// Compare the current tag with each of tagTypes one at a time
+		for (const tagType of tagTypes){
+			if (tag.startsWith(tagType+":")){
+				const value = tag.substring(tagType.length + 1)
+				filters[tagType].push(value)
+			}
+		}
+	}
+
+	for (var node of document.getElementById("details-security-list").childNodes){
+		const domain = node.domain
+		const status = information.domains[domain].status
+		// The true/false boolean needs to be converted to "yes"/"no" string
+		const thirdparty = information.domains[domain].thirdparty ? "yes" : "no"
+
+		/**
+		 * @param {Array} filter array of strings of properties to display
+		 * @param {String} property of the current listing
+		 * @returns {Boolean} true if we should display, false otherwise
+		 */
+		function selected(filter, information){
+			/* True if filter is not specified or if it specified and includes the current domain property */
+			return filter.length === 0 || filter.indexOf(information) > -1
+		}
+		const selectedDomain = selected(filters.domain, domain)
+		const selectedSecurity = selected(filters.security, status)
+		const selectedThirdparty = selected(filters.thirdparty, thirdparty)
+		if (selectedDomain && selectedSecurity && selectedThirdparty)
+			node.style.display = "block"
+		else
+			node.style.display = "none"
+	}
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 	function displaySectionPrimary(information) {}
 	function displaySectionThirdparty(information) {}
 	// TODO: Do not re-create the list from scratch every time
 	function displaySectionSecurity(information){
 		// No information to display
-		// TODO: display a friendly message
-		if (!information){
+		if (information === undefined){
+			// TODO: display a friendly message
 			console.log("No information to display")
 			return
 		}
@@ -236,6 +335,38 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		list.replaceWith(listNew)
 		listNew.id = "details-" + "security" + "-list"
+
+		/* Autocomplete */
+/*
+		var autocompleteField = document.getElementById("search-security")
+		const autocompleteOptions = {
+			data: searchTags({
+					"domain": Object.keys(information.domains),
+					"security": ["secure", "protected", "vulnerable", "insecure"],
+					"thirdparty": ["yes", "no"]
+				})
+		}
+		var autocomplete = M.Autocomplete.init(autocompleteField, autocompleteOptions)
+*/
+
+		/* Chips with Autocomplete */
+		var chipsField = document.getElementById("search-security-chips")
+		const chipsOptions = {
+			placeholder: "Search by domain or security level",
+			autocompleteOptions: {
+				data: searchTags({
+						"domain": Object.keys(information.domains),
+						"security": ["secure", "protected", "vulnerable", "insecure"],
+						"thirdparty": ["yes", "no"]
+						// TODO: "threat": ["leak", "leak-possible", "write", "write-possible"]
+					})
+			},
+			onChipAdd: function(a,b){searchResultUpdate(a,b,"add", information)},
+			onChipDelete: function(a,b){searchResultUpdate(a,b,"delete", information)},
+			onChipSelect: function(a,b){searchResultUpdate(a,b,"select", information)}
+		}
+		var chips = M.Chips.init(chipsField, chipsOptions)
+		console.log("CHIPS", chips)
 	}
 	function displaySectionDebugging(information) {}
 

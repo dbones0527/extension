@@ -2,13 +2,10 @@
 body {
 	margin: 0;
 	padding: 0;
-	font-family: sans-serif;
 }
 
-h1, h2, h3, p {
-	margin: 0;
-	padding: 5px;
-	padding-top: 10px;
+h1, h2, h3, h4, h5, p {
+	margin: 0 !important;
 }
 
 /* Size of the window on non-restricted pages */
@@ -19,15 +16,36 @@ h1, h2, h3, p {
 
 /* Style of the main menu */
 #main-menu {
+	/* Display in a column on the left */
 	width: 50%;
 	height: 100%;
 	float: left;
+
 	background-color: #eeeeee;
 	cursor: pointer;
 }
 
+/* Main menu item details */
+/* Wrapper */
+#main-menu > div > div {
+	height: 100%;
+	width: 100%;
+	display: flex;
+}
+
+/* Image */
+#main-menu > div > div > img {
+	width: 40%;
+}
+
+/* Content */
+#main-menu > div > div > div {
+	width: 60%;
+}
+
 /* Style of the Details section */
 #details {
+	/* Display in a column on the right */
 	width: 50%;
 	height: 100%;
 	float: right;
@@ -35,8 +53,7 @@ h1, h2, h3, p {
 }
 
 .main-menu-item {
-	padding-left: 10px;
-	padding-right: 10px;
+	padding: 10px;
 	transition: background-color 0.5s;
 }
 
@@ -47,6 +64,11 @@ h1, h2, h3, p {
 
 .main-menu-item-small {
 	height: 10%;
+
+	/* Vertically center the contents */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .main-menu-item-large {
@@ -57,12 +79,6 @@ h1, h2, h3, p {
 .main-menu-item--active {
 	background-color: #ffcc66;
 	transition: background-color 0.5s;
-}
-
-.main-menu-item > h2 {
-	margin: 0;
-	padding: 5px;
-	padding-top: 10px;
 }
 
 /* Unselected details section is hidden */
@@ -157,4 +173,14 @@ li.list-domain--disabled > a::after {
 
 li.list-domain--insecure > a::after {
 	background-image: url("/includes/fontawesome/exclamation-triangle.svg");
+}
+
+/*
+ * The look of the Autocomplete Chips
+ */
+/* Make search suggestions the same width as the search div
+ * This works because suggestion list width is set to input width
+ */
+#search-security-chips > input.input {
+	width: 100% !important;
 }

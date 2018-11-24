@@ -1,3 +1,16 @@
+/**
+ * webpack configuration script
+ * This script builds the extension according to the
+ * parameters specifid
+ */
+// Build output path, can be relative or absolute
+// TODO: support absolute paths without trailing /
+// Where to save the build
+const build_dir = "./build/"
+// Rebuild extension when source files are edited
+const watch = true
+/* End of parameters */
+
 const path = require("path")
 
 const ncp = require("ncp").ncp
@@ -5,17 +18,33 @@ ncp.limit = 16
 
 const fs = require("fs")
 
-const base = "./source/common/"
-const build = "./build/"
+const base_extension = "./source/common/"
+const base_library = "./node_modules"
 
-const dirs = ["", "pages/", "img-t/", "includes/"]
+// build can be absolute path
+const build_dir_long = path.resolve(__dirname, build_dir)
 
-const copy = [
+const dirs = ["", "pages/", "img-t/", "includes/", "includes/materialize-css"]
+
+const copy_extension = [
 	"pages/",
 	"img-t/",
 	"includes/",
 	"manifest.json"
 ]
+
+const copy_library = {
+	"materialize-css-styles": {
+		dev:  "./node_modules/materialize-css/dist/css/materialize.css",
+		prod: "./node_modules/materialize-css/dist/css/materialize.min.css",
+		dst:  "includes/materialize-css/materialize.css"
+	},
+	"materialize-css-scripts": {
+		dev:  "./node_modules/materialize-css/dist/js/materialize.js",
+		prod: "./node_modules/materialize-css/dist/js/materialize.min.js",
+		dst:  "includes/materialize-css/materialize.js"
+	}
+}
 
 const files = [
 	"background/cookiestore.js",
@@ -24,30 +53,43 @@ const files = [
 ]
 
 // Create all dirs if they do not exists yet
-for (const dir of dirs)
-	if (!fs.existsSync(build+dir))
-		fs.mkdirSync(build+dir)
-
+for (const dir of dirs){
+	const dir_full = build_dir_long+"/"+dir
+	if (!fs.existsSync(dir_full))
+		fs.mkdirSync(dir_full)
+}
 // Copy all files that do not require processing
-for (const src of copy)
-	ncp(base + src, build + src, function (err) {
+for (const src of copy_extension)
+	ncp(base_extension + src, build_dir_long + "/" + src, function (err) {
 		if (err)
 			return console.error(err)
 		console.log("Copied " + src)
 	})
 
+// Copy all library files that do not require processing
+for (const library in copy_library){
+	const destination = build_dir_long + "/" + copy_library[library].dst
+	ncp(copy_library[library].dev, destination, function (err) {
+		if (err)
+			return console.error(err)
+		console.log("Copied library: " + library)
+	})
+}
+
 // Add all files that do require processing to webpack work order
 var entries = {}
 for (const file of files){
-	entries[file] = base + file
+	entries[file] = base_extension + file
 	console.log("Added for packaging " + file)
 }
 
 // Ask webpack to process these files
 module.exports = {
 	entry: entries,
-  output: {
-    path: path.resolve(__dirname, build),
-    filename: "[name]"
-  }
+	output: {
+		// build can be absolute or relative path
+		path: build_dir_long,
+		filename: "[name]"
+	},
+	watch: watch
 }

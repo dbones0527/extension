@@ -18,7 +18,7 @@ ncp.limit = 16
 
 const fs = require("fs")
 
-const base_extension = "./source/common/"
+const base_extension = "./source/"
 const base_library = "./node_modules"
 
 // build can be absolute path

@@ -4,41 +4,41 @@ var injectionSuccessful = true
 
 console.log("Injection completed, try logging the variable injectionSuccessful")
 
-function sendMessage(message){
-	var event = new CustomEvent("cookie_message", {detail: message})
-	document.dispatchEvent(event)
+const sendMessage = (message) => {
+  const event = new CustomEvent("cookie_message", {detail: message})
+  document.dispatchEvent(event)
 }
 
 /*
  * Function processing cookie during retreival
  */
-function processGetCookieString(cookieString){
-	console.log("Cookie read: ", cookieString)
-//	sendMessage({"event": "read"})
-	return cookieString
+const processGetCookieString = (cookieString) => {
+  console.log("Cookie read: ", cookieString)
+//  sendMessage({"event": "read"})
+  return cookieString
 }
 
 /*
  * Function processing cookie during assignment
  */
-function processSetCookieStr(cookieString){
-	console.log("Cookie set: ", cookieString)
-//	sendMessage({"event": "write", "cookie": cookieString})
-	return cookieString
+const processSetCookieStr = (cookieString) => {
+  console.log("Cookie set: ", cookieString)
+//  sendMessage({"event": "write", "cookie": cookieString})
+  return cookieString
 }
 
 /*
  * Wedge custom cookie handlers in regular setters and getters
  */
-var cookieGetter = document.__lookupGetter__("cookie").bind(document)
-var cookieSetter = document.__lookupSetter__("cookie").bind(document)
+const cookieGetter = document.__lookupGetter__("cookie").bind(document)
+const cookieSetter = document.__lookupSetter__("cookie").bind(document)
 
 Object.defineProperty (document, "cookie", {
-	get: function() {
-		return processGetCookieString (cookieGetter())
-	},
+  get: () => {
+    return processGetCookieString (cookieGetter())
+  },
 
-	set: function(cookieString) {
-		return cookieSetter (processSetCookieStr(cookieString))
-	}
+  set: (cookieString) => {
+    return cookieSetter (processSetCookieStr(cookieString))
+  }
 })

@@ -26,8 +26,8 @@
   },
   "background": {
     "scripts": [
-        "background/cookiestore.js"
-      ],
+      "background/cookiestore.js"
+    ],
     "persistent": true
   },
   "content_scripts": [

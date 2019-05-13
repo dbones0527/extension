@@ -27,9 +27,11 @@ const build_dir_long = path.resolve(__dirname, build_dir)
 const dirs = ["", "pages/", "images/", "includes/", "includes/materialize-css"]
 
 const copy_extension = [
+  "content_scripts/",
   "pages/",
   "images/",
   "includes/",
+  "web_accessible_resources/",
   "manifest.json"
 ]
 

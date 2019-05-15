@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   platform.permissions.getAll((/* Permissions */ permissions) => {
     debugMessage("Obtained permissions: "+ permissions.permissions + permissions.origins)
     const permissionsLength = permissions.permissions.length
-    for (const i = 0; i < permissionsLength; i++) {
+    for (let i = 0; i < permissionsLength; i++) {
       switch (permissions.permissions[i]){
         case "webRequestBlocking":
           webRequest.checked = true

@@ -15,28 +15,20 @@
 
     <ul>
       <li>
-        <input type="checkbox" id="DevTools">
-        <label for="DevTools">Developer Tools pane</label>
+        <input type="checkbox" id="devTools">
+        <label for="devTools">Developer Tools pane</label>
       </li>
       <li>
-        <input type="checkbox" id="WebRequest">
-        <label for="WebRequest">Track network requests</label>
+        <input type="checkbox" id="webRequest">
+        <label for="webRequest">Track network requests</label>
+      </li>
+      <li>
+        <input type="checkbox" id="darkStyle">
+        <label for="darkStyle">Use Dark Mode style</label>
       </li>
     </ul>
 
     <p>Developer tools pane is located in "Menu">"More tools">"Developer tools". This pane is more convenient then just the popup interface, since it does not close when user interacts with the page. This feature requires devtools permission, which can not be dynamically requested.</p>
     <p>Extension can track network requests to detect when cookies are set via Set-Cookie header in the HTTP(S) response and record whether the connection was secure or not. This requires WebRequest permission, which is dynamically requested every time you enable this feature (browser might prompt you for this permission only the first time you enable it).</p>
-
-    <h2>Allow Origins</h2>
-
-    <p>This setting works similarly to the Chromium content settings. This is just the list of "origins" specified in the permissions. Simply put, the extension will only run on the pages matching at least one expression:</p>
-    <form id="newOriginForm">
-    <label for="newOrigin">New origin</label>
-    <input type="text" id="newOrigin" placeholder="https://example.com/" required>
-    <input type="submit" value="Add origin">
-    </form>
-    <p>TODO: for some reasson, domains have to end with slash.</p>
-    <ul id="origins"></ul>
-
   </body>
 </html>

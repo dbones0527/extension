@@ -1,5 +1,13 @@
+body {
+  cursor: default;
+}
+
 ul {
-  list-style: none
+  list-style: none;
+}
+
+input, label {
+  cursor: pointer;
 }
 
 #origins > li {

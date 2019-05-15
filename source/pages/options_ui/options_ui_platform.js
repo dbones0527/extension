@@ -3,5 +3,5 @@
 const platform = chrome
 
 function originIsDisplayable(origin){
-	return !origin.startsWith("moz-extension:\/\/")
+  return !origin.startsWith("moz-extension:\/\/")
 }

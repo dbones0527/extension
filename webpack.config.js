@@ -8,7 +8,7 @@
 // Where to save the build
 const build_dir = "./build/"
 // Rebuild extension when source files are edited
-const watch = true
+const watch = false
 /* End of parameters */
 
 const path = require("path")
@@ -49,9 +49,9 @@ const copy_library = {
 }
 
 const files = [
-  "background/cookiestore.js",
-  "content_scripts/inject.js",
-  "web_accessible_resources/inject.js"
+  "background/cookiestore.js"
+  //"content_scripts/inject.js",
+  //"web_accessible_resources/inject.js"
 ]
 
 // Create all dirs if they do not exists yet

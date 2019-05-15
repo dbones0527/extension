@@ -1,20 +1,20 @@
 ul {
-	list-style: none
+  list-style: none
 }
 
 #origins > li {
-	border-bottom: 1px solid silver;
-	height: 2em;
-	margin-right: 5%;
-	margin-top: 1em;
+  border-bottom: 1px solid silver;
+  height: 2em;
+  margin-right: 5%;
+  margin-top: 1em;
 }
 
 #origins > li > button {
-	height: 100%;
-	width: 2em;
-	float: right;
-	background-image: url("deleteButton.png");
-	background-size: cover;
-	background-position: center center;
-	border: none;
+  height: 100%;
+  width: 2em;
+  float: right;
+  background-image: url("deleteButton.png");
+  background-size: cover;
+  background-position: center center;
+  border: none;
 }

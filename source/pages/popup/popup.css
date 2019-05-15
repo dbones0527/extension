@@ -1,106 +1,106 @@
 /* Remove all margins to make window properly fit the contents */
 body {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 h1, h2, h3, h4, h5, p {
-	margin: 0 !important;
+  margin: 0 !important;
 }
 
 /* Size of the window on non-restricted pages */
 #content {
-	height: 600px;
-	width: 600px;
+  height: 600px;
+  width: 600px;
 }
 
 /* Style of the main menu */
 #main-menu {
-	/* Display in a column on the left */
-	width: 50%;
-	height: 100%;
-	float: left;
+  /* Display in a column on the left */
+  width: 50%;
+  height: 100%;
+  float: left;
 
-	background-color: #eeeeee;
-	cursor: pointer;
+  background-color: #eeeeee;
+  cursor: pointer;
 }
 
 /* Main menu item details */
 /* Wrapper */
 #main-menu > div > div {
-	height: 100%;
-	width: 100%;
-	display: flex;
+  height: 100%;
+  width: 100%;
+  display: flex;
 }
 
 /* Image */
 #main-menu > div > div > img {
-	width: 40%;
+  width: 40%;
 }
 
 /* Content */
 #main-menu > div > div > div {
-	width: 60%;
+  width: 60%;
 }
 
 /* Style of the Details section */
 #details {
-	/* Display in a column on the right */
-	width: 50%;
-	height: 100%;
-	float: right;
-	position: relative;
+  /* Display in a column on the right */
+  width: 50%;
+  height: 100%;
+  float: right;
+  position: relative;
 }
 
 .main-menu-item {
-	padding: 10px;
-	transition: background-color 0.5s;
+  padding: 10px;
+  transition: background-color 0.5s;
 }
 
 .main-menu-item:not(.main-menu-item--active):hover {
-	background-color: #ffe6b3;
-	transition: background-color 0.1s;
+  background-color: #ffe6b3;
+  transition: background-color 0.1s;
 }
 
 .main-menu-item-small {
-	height: 10%;
+  height: 10%;
 
-	/* Vertically center the contents */
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
+  /* Vertically center the contents */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .main-menu-item-large {
-	height: 30%;
+  height: 30%;
 }
 
 /* The style modifier for selecter main menu item */
 .main-menu-item--active {
-	background-color: #ffcc66;
-	transition: background-color 0.5s;
+  background-color: #ffcc66;
+  transition: background-color 0.5s;
 }
 
 /* Unselected details section is hidden */
 .details-item {
-	display: none;
+  display: none;
 }
 
 /* Style of the selected details section */
 .details-item--active {
-	display: block;
-	height: 100%;
-	position: absolute;
-	top: 0; bottom: 0;
-	left: 0; right: 0;
-	overflow: auto;
+  display: block;
+  height: 100%;
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0; right: 0;
+  overflow: auto;
 }
 
 /* The "informaton" button in the main menu */
 .info{
-	width: 1em;
-	float: right;
-	cursor: help;
+  width: 1em;
+  float: right;
+  cursor: help;
 }
 
 /*
@@ -108,16 +108,16 @@ h1, h2, h3, h4, h5, p {
  */
 
 .list-collapsible {
-	list-style: none;
-	padding-inline-start: 1em;
+  list-style: none;
+  padding-inline-start: 1em;
 }
 
 .list-collapsible > li > ul{
-	display:none
+  display:none
 }
 
 .list-collapsible--active > ul {
-	display:block !important
+  display:block !important
 }
 
 /*
@@ -126,12 +126,12 @@ h1, h2, h3, h4, h5, p {
  * in CLOSED position
  */
 .list-collapsible > li::before {
-	background-image: url("/includes/fontawesome/caret-right.svg");
-	background-size: 20px;
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	content:"";
+  background-image: url("/includes/fontawesome/caret-right.svg");
+  background-size: 20px;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  content:"";
 }
 
 /* The look of the drop-down indicator
@@ -139,12 +139,12 @@ h1, h2, h3, h4, h5, p {
  * in OPEN position
  */
 ul.list-collapsible > li.list-collapsible--active::before {
-	background-image: url("/includes/fontawesome/caret-down.svg");
-	background-size: 20px;
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	content:"";
+  background-image: url("/includes/fontawesome/caret-down.svg");
+  background-size: 20px;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  content:"";
 }
 
 /* The icon to the right of the domain name in the list
@@ -152,27 +152,27 @@ ul.list-collapsible > li.list-collapsible--active::before {
  */
 
 li.list-domain > a::after {
-	background-size: 20px;
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	content:"";
+  background-size: 20px;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  content:"";
 }
 
 li.list-domain--secure > a::after {
-	background-image: url("/includes/fontawesome/check.svg");
+  background-image: url("/includes/fontawesome/check.svg");
 }
 
 li.list-domain--enabled > a::after {
-	background-image: url("/includes/fontawesome/lock.svg");
+  background-image: url("/includes/fontawesome/lock.svg");
 }
 
 li.list-domain--disabled > a::after {
-	background-image: url("/includes/fontawesome/unlock.svg");
+  background-image: url("/includes/fontawesome/unlock.svg");
 }
 
 li.list-domain--insecure > a::after {
-	background-image: url("/includes/fontawesome/exclamation-triangle.svg");
+  background-image: url("/includes/fontawesome/exclamation-triangle.svg");
 }
 
 /*
@@ -182,5 +182,5 @@ li.list-domain--insecure > a::after {
  * This works because suggestion list width is set to input width
  */
 #search-security-chips > input.input {
-	width: 100% !important;
+  width: 100% !important;
 }

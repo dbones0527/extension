@@ -13,5 +13,5 @@ module.exports = {thirdparty: thirdparty}
 // E.g.: "cdn.example.com".endsWith("www.example.com".replace("www.", "")) === true
 
 function thirdparty (origin, resource){
-	return !resource.endsWith(origin.replace("www.", ""))
+  return !resource.endsWith(origin.replace("www.", ""))
 }

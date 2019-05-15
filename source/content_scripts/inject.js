@@ -1,12 +1,14 @@
 // This code is executed in a separate context with "clean DOM"
 
-const prefix = "chrome-extension://ahebiabmadaookaondjagfaedejgedlc"
+const scriptPath = "web_accessible_resources/inject.js"
 
 // Execute the actal payload in the context of the window
-const script = document.createElement("SCRIPT")
-script.src = () => {return prefix + "/web_accessible_resources/inject.js" }
-(document.head || document.documentElement).appendChild(script)
-script.parentNode.removeChild(script)
+const scriptNode = document.createElement("SCRIPT");
+scriptNode.src = chrome.runtime.getURL(scriptPath);
+(document.head || document.documentElement).appendChild(scriptNode);
+scriptNode.onload = () => {
+//  this.remove()
+}
 
 console.info("content script executed")
 

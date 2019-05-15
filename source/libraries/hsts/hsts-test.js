@@ -7,29 +7,29 @@ const hsts = require("./hsts")
 //
 
 const testParseResponseHeaderStrictTransportSecurity = [
-	{
-		"input": "max-age=31536000",
-		"answer": {"maxAge": 31536000, "includeSubDomains": false, "preload": false} 
-	},
-	{
-		"input": "max-age=15768000 ; includeSubDomains",
-		"answer": {"maxAge": 15768000, "includeSubDomains": true, "preload": false}
-	},
-	{
-		"input" : "max-age=\"31536000\"",
-		"answer": {"maxAge": 31536000, "includeSubDomains": false, "preload": false}
-	},
-	{
-		"input": "max-age=0",
-		"answer": {"maxAge": 0, "includeSubDomains": false, "preload": false}
-	},
-	{
-		"input": "max-age=0; includeSubDomains",
-		"answer": {"maxAge": 0, "includeSubDomains": true, "preload": false}
-	}
+  {
+    "input": "max-age=31536000",
+    "answer": {"maxAge": 31536000, "includeSubDomains": false, "preload": false} 
+  },
+  {
+    "input": "max-age=15768000 ; includeSubDomains",
+    "answer": {"maxAge": 15768000, "includeSubDomains": true, "preload": false}
+  },
+  {
+    "input" : "max-age=\"31536000\"",
+    "answer": {"maxAge": 31536000, "includeSubDomains": false, "preload": false}
+  },
+  {
+    "input": "max-age=0",
+    "answer": {"maxAge": 0, "includeSubDomains": false, "preload": false}
+  },
+  {
+    "input": "max-age=0; includeSubDomains",
+    "answer": {"maxAge": 0, "includeSubDomains": true, "preload": false}
+  }
 ]
 
 for (const testcase of testParseResponseHeaderStrictTransportSecurity){
-	console.log (hsts.parseHSTSHeader(testcase.input))
-	console.log (testcase.answer)
+  console.log (hsts.parseHSTSHeader(testcase.input))
+  console.log (testcase.answer)
 }
